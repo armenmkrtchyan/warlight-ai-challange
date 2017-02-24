@@ -107,6 +107,10 @@ public class WarlightMapImpl implements WarlightMap {
 
     }
 
+    @Override
+    public List<Region> getAllRegions() {
+        return regions;
+    }
 
     @Override
     public void update(String config) {

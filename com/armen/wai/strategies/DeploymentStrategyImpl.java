@@ -1,26 +1,35 @@
 package com.armen.wai.strategies;
 
 import com.armen.wai.analytics.MapAnalysis;
+import com.armen.wai.analytics.MapAnalysisImpl;
 import com.armen.wai.map.Region;
 import com.armen.wai.move.Deployment;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
- * Created by Anushavan on 2/25/17.
+ * @author armen.mkrtchyan
  */
 public class DeploymentStrategyImpl implements DeploymentStrategy {
 
-    public DeploymentStrategyImpl() { }
+    private final MapAnalysis mapAnalysis;
+
+    public DeploymentStrategyImpl(MapAnalysis mapAnalysis) {
+        this.mapAnalysis = mapAnalysis;
+    }
+
 
     @Override
-    public Collection<Deployment> getDeployments(MapAnalysis mapAnalysis) {
+    public Collection<Deployment> getDeployments() {
+        List<Region> orderedRegions
+                = mapAnalysis.suggestDeploymentRegions();
+        List<Deployment> deployments
         return null;
     }
 
     @Override
-    public Collection<Region> pickInitialRegions(MapAnalysis mapAnalysis) {
-        return null;
+    public List<Region> pickInitialRegions(Collection<Region> regions) {
+        return mapAnalysis.suggestRegionOrder(regions);
     }
-
 }

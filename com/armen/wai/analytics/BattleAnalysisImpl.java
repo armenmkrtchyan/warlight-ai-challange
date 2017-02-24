@@ -1,9 +1,13 @@
 package com.armen.wai.analytics;
 
+import com.armen.wai.map.Region;
+import com.armen.wai.move.Deployment;
 import com.armen.wai.util.SuperGraph;
 
+import java.util.List;
+
 /**
- * Created by Anushavan on 2/25/17.
+ * @author armen.mkrtchyan
  */
 public class BattleAnalysisImpl implements BattleAnalysis {
 
@@ -11,5 +15,11 @@ public class BattleAnalysisImpl implements BattleAnalysis {
 
     public BattleAnalysisImpl(SuperGraph superGraph) {
         this.superGraph = superGraph;
+    }
+
+    @Override
+    public List<Deployment> suggestDeployment(List<Region> orderedRegions) {
+
+        return;
     }
 }

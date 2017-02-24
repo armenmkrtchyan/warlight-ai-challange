@@ -5,14 +5,15 @@ import com.armen.wai.map.Region;
 import com.armen.wai.move.Deployment;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author armen.mkrtchyan
  */
 public interface DeploymentStrategy {
 
-    Collection<Deployment> getDeployments(MapAnalysis mapAnalysis);
+    Collection<Deployment> getDeployments();
 
-    Collection<Region> pickInitialRegions(MapAnalysis mapAnalysis);
+    List<Region> pickInitialRegions(Collection<Region> regions);
 
 }

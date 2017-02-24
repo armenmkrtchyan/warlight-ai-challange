@@ -12,4 +12,6 @@ public interface MapAnalysis {
 
     List<Region> suggestRegionOrder(Collection<Region> regions);
 
+
+    List<Region> suggestDeploymentRegions();
 }

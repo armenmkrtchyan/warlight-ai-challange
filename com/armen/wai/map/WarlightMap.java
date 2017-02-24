@@ -3,6 +3,7 @@ package com.armen.wai.map;
 import com.armen.wai.util.SuperGraph;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author armen.mkrtchyan
@@ -18,5 +19,7 @@ public interface WarlightMap {
     Collection<Region> getRegionsByIds(String config);
 
     SuperGraph getSuperGraph();
+
+    List<Region> getAllRegions();
 
 }

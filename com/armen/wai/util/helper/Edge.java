@@ -102,7 +102,7 @@ public class Edge implements Comparable<Edge>, Cloneable {
      * @return the weight
      */
     public int getWeight() {
-        return weight;
+        return to.getOwnerType().equals(OwnerType.Self) ? 0 : weight;
     }
 
     @Override

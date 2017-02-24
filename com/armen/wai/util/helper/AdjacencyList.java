@@ -75,6 +75,12 @@ public class AdjacencyList implements Cloneable {
         addEdge(source, target, weight);
     }
 
+
+    public void removeTargets(Collection<Node> targets) {
+        this.adjacencies.values()
+                .forEach(edges -> edges.removeIf(edge -> targets.contains(edge.getTo())));
+    }
+
     public void setEdgeWeight(Integer sourceId, Integer targetId, int weight) {
         Node source = new Node(sourceId);
         Node target = new Node(targetId);

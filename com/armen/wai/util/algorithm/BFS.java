@@ -16,7 +16,7 @@ public class BFS {
     /**
      * Get closest enemy node object and distance
      */
-    private Pair<Node,Integer> closestEnemy(Node node, SuperGraph graph){
+    public Pair<Node,Integer> closestEnemy(Node node, SuperGraph graph){
 
         Queue<Node> queue = new LinkedList<>();
         Map<Node, Boolean> visited = new HashMap<>();

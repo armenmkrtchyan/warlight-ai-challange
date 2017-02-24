@@ -23,6 +23,8 @@ import com.armen.wai.strategies.DeploymentStrategy;
 import com.armen.wai.strategies.DeploymentStrategyImpl;
 import com.armen.wai.strategies.MoveStrategy;
 import com.armen.wai.strategies.MoveStrategyImpl;
+import com.armen.wai.strategies.DeploymentStrategy;
+import com.armen.wai.strategies.DeploymentStrategyImpl;
 import com.armen.wai.util.Settings;
 
 import java.util.Collection;
@@ -41,9 +43,9 @@ public class BotParser {
     private final WarlightMap warlightMap = new WarlightMapImpl(settings);
     private final DeploymentStrategy deploymentStrategy = new DeploymentStrategyImpl();
     private final MoveStrategy moveStrategy = new MoveStrategyImpl();
-    private MapAnalysis mapAnalysis;
+    private MapAnalysis mapAnalysis = new MapAnalysisImpl(warlightMap.getSuperGraph(), warlightMap);
+    private final DeploymentStrategy deploymentStrategy = new DeploymentStrategyImpl(mapAnalysis);
     private BattleAnalysis battleAnalysis;
-
     private List<Region> suggestedRegions;
 
     public BotParser() {
@@ -63,9 +65,7 @@ public class BotParser {
                 if (parts.group(1) .equals("pick_starting_region")) {
                     if (suggestedRegions == null) {
                         Collection<Region> regions = warlightMap.getRegionsByIds(parts.group(3));
-                        mapAnalysis = new MapAnalysisImpl(warlightMap.getSuperGraph());
-                        battleAnalysis = new BattleAnalysisImpl(warlightMap.getSuperGraph());
-                        suggestedRegions = mapAnalysis.suggestRegionOrder(regions);
+                        suggestedRegions = deploymentStrategy.pickInitialRegions(regions);
                     }
                     System.out.println(suggestedRegions.get(0));
                     suggestedRegions.remove(0);

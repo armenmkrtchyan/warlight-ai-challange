@@ -42,9 +42,15 @@ public class SuperGraph extends AdjacencyList {
     }
 
     public AdjacencyList getMinBranching(Integer root, Integer subGraphGroup) {
+        AdjacencyList adjacencyList = getSubGraph(subGraphGroup).clone();
+        adjacencyList.removeTargets(adjacencyList.getSourceNodeSet()
+                .stream()
+                .filter(node -> node.getOwnerType().equals(OwnerType.Self))
+                .collect(Collectors.toList()));
         return new EdmondsChuLiu().getMinBranching(new Node(root),
-                getSubGraph(subGraphGroup).clone());
+                adjacencyList);
     }
+
 
     public void updateOwnership(Set<Integer> id, OwnerType ownerType) {
         getSourceNodeSet().stream()
@@ -57,6 +63,5 @@ public class SuperGraph extends AdjacencyList {
                 .filter(node -> id.equals(node.getId()))
                 .forEach(node -> node.setOwnerType(ownerType));
     }
-
 
 }
