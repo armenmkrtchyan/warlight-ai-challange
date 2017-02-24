@@ -5,7 +5,14 @@ import com.armen.wai.util.SuperGraph;
 import com.armen.wai.util.helper.Node;
 import com.armen.wai.util.helper.OwnerType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -19,9 +26,11 @@ public class WarlightMapImpl implements WarlightMap {
     private List<Integer> opponentStartingRegions;
     private List<Region> regions;
     private List<SuperRegion> superRegions;
+    private final Settings settings;
 
-    public WarlightMapImpl() {
+    public WarlightMapImpl(Settings settings) {
         this.superGraph = new SuperGraph();
+        this.settings = settings;
     }
 
 
@@ -101,14 +110,14 @@ public class WarlightMapImpl implements WarlightMap {
 
     @Override
     public void update(String config) {
-        List<String> configs = Arrays.asList(config.split(" "));
-
-        for (int i = 0; i < configs.size() - 2; i += 3) {
-            Integer id = Integer.parseInt(configs.get(i));
-            String botName = configs.get(i + 1);
-            Integer armiesReward = Integer.parseInt(configs.get(i + 2));
-
-            // TODO: do update
+        String[] configs = config.split(" ");
+        for (int i = 0; i < configs.length - 2; i += 3) {
+            Integer id = Integer.parseInt(configs[i]);
+            String botName = configs[i + 1];
+            Integer armiesCount = Integer.parseInt(configs[i + 2]);
+            superGraph.setAdjacencyWeight(id, armiesCount);
+            superGraph.updateOwnership(id,
+                    botName.equals(settings.getYourBot()) ? OwnerType.Self : OwnerType.Enemy);
         }
     }
 
@@ -160,36 +169,6 @@ public class WarlightMapImpl implements WarlightMap {
         return parsedNeighborsMap;
     }
 
-    @Override
-    public void settings(String[] configLine) {
-        Settings settings = new Settings();
-        switch (configLine[0]) {
-            case "timebank":
-                settings.setTimeBank(Long.valueOf(configLine[1]));
-                break;
-            case "time_per_move":
-                settings.setTimePerMove(Integer.valueOf(configLine[1]));
-                break;
-            case "max_rounds":
-                settings.setMaxRounds(Integer.valueOf(configLine[1]));
-                break;
-            case "your_bot":
-                settings.setYourBot(configLine[1]);
-                break;
-            case "opponent_bot":
-                settings.setOpponentBot(configLine[1]);
-                break;
-            case "starting_regions":
-                ArrayList<Integer> startingRegions = new ArrayList<>();
-                for(int i = 1; i < configLine.length; i++) {
-                    startingRegions.add(Integer.valueOf(configLine[i]));
-                }
-                settings.setStartingRegions(startingRegions);
-                break;
-            case "starting_pick_amount":
-                settings.setStartingPickAmount(Integer.valueOf(configLine[1]));
-        }
-    }
 
     public Collection<Region> getRegionsByIds(String config) {
         return Arrays.asList(config.split(" "))

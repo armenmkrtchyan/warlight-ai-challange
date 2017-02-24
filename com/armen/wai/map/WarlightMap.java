@@ -15,8 +15,6 @@ public interface WarlightMap {
 
     void update(String config);
 
-    void settings(String[] configLine);
-
     Collection<Region> getRegionsByIds(String config);
 
     SuperGraph getSuperGraph();

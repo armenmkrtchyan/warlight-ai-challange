@@ -16,6 +16,7 @@ import com.armen.wai.map.Region;
 import com.armen.wai.map.WarlightMap;
 import com.armen.wai.map.WarlightMapImpl;
 import com.armen.wai.move.AttackTransferMove;
+import com.armen.wai.util.Settings;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,8 +31,9 @@ public class BotParser {
 
     private final static Pattern configPattern = Pattern.compile("([\\w_]+)\\s([\\w_]+)\\s+(.+)");
 
-    BotState currentState;
-    private final WarlightMap warlightMap = new WarlightMapImpl();
+    private BotState currentState;
+    private final Settings settings = new Settings();
+    private final WarlightMap warlightMap = new WarlightMapImpl(settings);
     private MapAnalysis mapAnalysis;
     private List<Region> suggestedRegions;
 
@@ -73,18 +75,19 @@ public class BotParser {
                     else
                         System.out.println("No moves");
                 } else if (parts.group(1).equals("settings")) {
-                    //update settings
-    //				currentState.updateSettings(parts.group(2), parts.group(3));
-                } else if (parts.group(1).equals("setup_map")) {
-                    warlightMap.setup(parts.group(2), parts.group(3));
-                } else if (parts.group(1).equals("update_map")) {
-                    //all visible regions are given
-    //				currentState.updateMap(parts.group(2));
-                } else if (parts.group(1).equals("opponent_moves")) {
-                    //all visible opponent moves are given
-    //				currentState.readOpponentMoves(parts);
+                    settings.setup(parts.group(2), parts.group(3));
                 } else {
-                    System.err.printf("Unable to parse line \"%s\"\n", line);
+                    if (parts.group(1).equals("setup_map")) {
+                        warlightMap.setup(parts.group(2), parts.group(3));
+                    } else if (parts.group(1).equals("update_map")) {
+                        //all visible regions are given
+                        //				currentState.updateMap(parts.group(2));
+                    } else if (parts.group(1).equals("opponent_moves")) {
+                        //all visible opponent moves are given
+                        //				currentState.readOpponentMoves(parts);
+                    } else {
+                        System.err.printf("Unable to parse line \"%s\"\n", line);
+                    }
                 }
             }
         }

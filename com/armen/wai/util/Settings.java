@@ -7,17 +7,15 @@ import java.util.ArrayList;
  */
 public class Settings {
 
-    Long timeBank;
-    Integer timePerMove;
-    Integer maxRounds;
-    Integer startingArmies;
-    Integer startingPickAmount;
-    ArrayList<Integer> startingRegions;
-    String yourBot;
-    String opponentBot;
+    private Long timeBank;
+    private Integer timePerMove;
+    private Integer maxRounds;
+    private Integer startingArmies;
+    private Integer startingPickAmount;
+    private ArrayList<Integer> startingRegions;
+    private String yourBot;
+    private String opponentBot;
 
-
-    /*Getters and Setters*/
 
     public Long getTimeBank() {
         return timeBank;
@@ -81,5 +79,35 @@ public class Settings {
 
     public void setOpponentBot(String opponentBot) {
         this.opponentBot = opponentBot;
+    }
+
+    public void setup(String configKey, String config) {
+        switch (configKey) {
+            case "timebank":
+                this.setTimeBank(Long.valueOf(config));
+                break;
+            case "time_per_move":
+                this.setTimePerMove(Integer.valueOf(config));
+                break;
+            case "max_rounds":
+                this.setMaxRounds(Integer.valueOf(config));
+                break;
+            case "your_bot":
+                this.setYourBot(config);
+                break;
+            case "opponent_bot":
+                this.setOpponentBot(config);
+                break;
+            case "starting_regions":
+                ArrayList<Integer> startingRegions = new ArrayList<>();
+                String[] subConfig = config.split(" ");
+                for (String aSubConfig : subConfig) {
+                    startingRegions.add(Integer.valueOf(aSubConfig));
+                }
+                this.setStartingRegions(startingRegions);
+                break;
+            case "starting_pick_amount":
+                this.setStartingPickAmount(Integer.valueOf(config));
+        }
     }
 }

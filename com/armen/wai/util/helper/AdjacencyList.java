@@ -83,7 +83,15 @@ public class AdjacencyList implements Cloneable {
                     edges.stream().filter(edge -> edge.getTo().equals(target))
                             .findFirst().orElseThrow(RuntimeException::new).setWeight(weight);
                     return edges;
-        });
+                });
+
+    }
+
+    public void setAdjacencyWeight(Integer targetId, int weight) {
+        Node target = new Node(targetId);
+        getAllEdges().stream()
+                .filter(edge -> edge.getTo().getId() == targetId)
+                .forEach(edge -> edge.setWeight(weight));
 
     }
 
