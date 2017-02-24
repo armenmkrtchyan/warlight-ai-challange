@@ -6,5 +6,4 @@ package com.armen.wai.analytics;
 public interface BattleAnalysis {
 
 
-
 }

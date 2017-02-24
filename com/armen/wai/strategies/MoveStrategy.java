@@ -11,6 +11,6 @@ import java.util.List;
  */
 public interface MoveStrategy {
 
-    List<Move> moves(BattleAnalysis battleAnalysis, MapAnalysis mapAnalysis);
+    List<Move> getMoves(BattleAnalysis battleAnalysis, MapAnalysis mapAnalysis);
 
 }

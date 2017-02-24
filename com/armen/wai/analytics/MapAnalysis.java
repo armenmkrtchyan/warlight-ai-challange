@@ -4,7 +4,6 @@ import com.armen.wai.map.Region;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.PriorityQueue;
 
 /**
  * @author armen.mkrtchyan
@@ -12,6 +11,5 @@ import java.util.PriorityQueue;
 public interface MapAnalysis {
 
     List<Region> suggestRegionOrder(Collection<Region> regions);
-
 
 }

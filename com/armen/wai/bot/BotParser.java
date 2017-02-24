@@ -10,14 +10,19 @@
 
 package com.armen.wai.bot;
 
+import com.armen.wai.analytics.BattleAnalysis;
+import com.armen.wai.analytics.BattleAnalysisImpl;
 import com.armen.wai.analytics.MapAnalysis;
 import com.armen.wai.analytics.MapAnalysisImpl;
 import com.armen.wai.map.Region;
 import com.armen.wai.map.WarlightMap;
 import com.armen.wai.map.WarlightMapImpl;
 import com.armen.wai.move.Deployment;
+import com.armen.wai.move.Move;
 import com.armen.wai.strategies.DeploymentStrategy;
 import com.armen.wai.strategies.DeploymentStrategyImpl;
+import com.armen.wai.strategies.MoveStrategy;
+import com.armen.wai.strategies.MoveStrategyImpl;
 import com.armen.wai.util.Settings;
 
 import java.util.Collection;
@@ -34,9 +39,12 @@ public class BotParser {
 
     private final Settings settings = new Settings();
     private final WarlightMap warlightMap = new WarlightMapImpl(settings);
+    private final DeploymentStrategy deploymentStrategy = new DeploymentStrategyImpl();
+    private final MoveStrategy moveStrategy = new MoveStrategyImpl();
     private MapAnalysis mapAnalysis;
+    private BattleAnalysis battleAnalysis;
+
     private List<Region> suggestedRegions;
-    private DeploymentStrategy deploymentStrategy = new DeploymentStrategyImpl();
 
     public BotParser() {
         this.scan = new Scanner(System.in);
@@ -56,12 +64,12 @@ public class BotParser {
                     if (suggestedRegions == null) {
                         Collection<Region> regions = warlightMap.getRegionsByIds(parts.group(3));
                         mapAnalysis = new MapAnalysisImpl(warlightMap.getSuperGraph());
+                        battleAnalysis = new BattleAnalysisImpl(warlightMap.getSuperGraph());
                         suggestedRegions = mapAnalysis.suggestRegionOrder(regions);
                     }
                     System.out.println(suggestedRegions.get(0));
                     suggestedRegions.remove(0);
                 } else if (parts.groupCount() == 3 && parts.group(1).equals("go")) {
-                    //we need to do a move
                     String output = "";
                     if (parts.group(2).equals("place_armies")) {
                         if (mapAnalysis == null) {
@@ -69,7 +77,10 @@ public class BotParser {
                         }
                         sysOutDeploys(deploymentStrategy.getDeployments(mapAnalysis));
                     } else if (parts.group(2).equals("attack/transfer")) {
-                        //attack/transfer
+                        if (mapAnalysis == null) {
+                            throw new IllegalStateException("Something goes wrong in starting picks");
+                        }
+                        sysOutTransfers(moveStrategy.getMoves(battleAnalysis, mapAnalysis));
                     }
                     if (output.length() > 0)
                         System.out.println(output);
@@ -100,7 +111,23 @@ public class BotParser {
         String botName = settings.getYourBot();
 
         for (Deployment deployment : deployments) {
-            output += botName + " place_armies " + deployment.getRegion().getId() + " " + deployment.getArmies() + ", ";
+            output += botName + " place_armies "
+                    + deployment.getRegion().getId() + " "
+                    + deployment.getArmies() + ", ";
+        }
+
+        System.out.println(output.trim());
+    }
+
+    private void sysOutTransfers(List<Move> moves) {
+        String output = "";
+        String botName = settings.getYourBot();
+
+        for (Move move : moves) {
+            output += botName + " attack/transfer "
+                    + move.getStartRegion().getId() + " "
+                    + move.getEndRegion().getId() + " "
+                    + move.getArmies() + ", ";
         }
 
         System.out.println(output.trim());
