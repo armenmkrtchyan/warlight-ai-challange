@@ -25,6 +25,16 @@ public class WarlightMapImpl implements WarlightMap {
                 neighborsParse(config);
                 break;
             }
+            case "wastelands": {
+                List<String> configs = Arrays.asList(config.split(" "));
+                List<Integer> wastelands = configs.stream().map(Integer::parseInt).collect(Collectors.toList());
+                break;
+            }
+            case "opponent_starting_regions": {
+                List<String> configs = Arrays.asList(config.split(" "));
+                List<Integer> opponentStartingRegions = configs.stream().map(Integer::parseInt).collect(Collectors.toList());
+                break;
+            }
         }
     }
 
