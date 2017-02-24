@@ -20,4 +20,12 @@ public class Region {
 		this.superRegionId = superRegionId;
 	}
 
+
+    public Integer getId() {
+        return id;
+    }
+
+    public Integer getSuperRegionId() {
+        return superRegionId;
+    }
 }
