@@ -3,6 +3,7 @@ package com.armen.wai.map;
 import com.armen.wai.util.Settings;
 import com.armen.wai.util.SuperGraph;
 import com.armen.wai.util.helper.Node;
+import com.armen.wai.util.helper.OwnerType;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -57,6 +58,7 @@ public class WarlightMapImpl implements WarlightMap {
     public void finalSetup() {
         configureNeighbours();
         configureSubRegions();
+        this.superGraph.updateOwnership(this.wastelands, OwnerType.Neutral);
     }
 
     @Override
@@ -79,6 +81,7 @@ public class WarlightMapImpl implements WarlightMap {
                 wastelands = configs.stream()
                         .map(Integer::parseInt)
                         .collect(Collectors.toSet());
+
                 break;
             }
             case "opponent_starting_regions": {
@@ -91,6 +94,8 @@ public class WarlightMapImpl implements WarlightMap {
             default:
                 throw new IllegalStateException("Unrecognized configuration");
         }
+
+
     }
 
 

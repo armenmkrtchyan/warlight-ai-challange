@@ -38,6 +38,7 @@ public class Node implements Comparable<Node>, Cloneable {
     private int lowlink = -1;          // used for Tarjan's algorithm
     private int index = -1;            // used for Tarjan's algorithm
     private final int id;
+    private OwnerType ownerType = OwnerType.Unknown;
 
     /**
      * 
@@ -150,5 +151,13 @@ public class Node implements Comparable<Node>, Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public OwnerType getOwnerType() {
+        return ownerType;
+    }
+
+    public void setOwnerType(OwnerType ownerType) {
+        this.ownerType = ownerType;
     }
 }
