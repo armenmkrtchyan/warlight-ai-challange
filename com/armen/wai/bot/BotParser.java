@@ -10,12 +10,16 @@
 
 package com.armen.wai.bot;
 
+import com.armen.wai.analytics.MapAnalysis;
+import com.armen.wai.analytics.MapAnalysisImpl;
 import com.armen.wai.map.Region;
 import com.armen.wai.map.WarlightMap;
 import com.armen.wai.map.WarlightMapImpl;
 import com.armen.wai.move.AttackTransferMove;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,6 +34,8 @@ public class BotParser {
 
     BotState currentState;
     private final WarlightMap warlightMap = new WarlightMapImpl();
+    private MapAnalysis mapAnalysis;
+    private List<Region> suggestedRegions;
 
     public BotParser(Bot bot) {
         this.scan = new Scanner(System.in);
@@ -47,14 +53,14 @@ public class BotParser {
             }
             Matcher parts = configPattern.matcher(line);
             if (parts.matches()) {
-                if (parts.group(1)
-                        .equals("pick_starting_region")) //pick which regions you want to start with
-                {
-    //				currentState.setPickableStartingRegions(parts);
-                    Region startingRegion = bot.getStartingRegion(currentState,
-                            Long.valueOf(parts.group(2)));
-
-                    System.out.println(startingRegion.getId());
+                if (parts.group(1) .equals("pick_starting_region")) {
+                    if (suggestedRegions == null) {
+                        Collection<Region> regions = warlightMap.getRegionsByIds(parts.group(3));
+                        mapAnalysis = new MapAnalysisImpl(warlightMap.getSuperGraph());
+                        suggestedRegions = mapAnalysis.suggestRegionOrder(regions);
+                    }
+                    System.out.println(suggestedRegions.get(0));
+                    suggestedRegions.remove(0);
                 } else if (parts.groupCount() == 3 && parts.group(1).equals("go")) {
                     //we need to do a move
                     String output = "";

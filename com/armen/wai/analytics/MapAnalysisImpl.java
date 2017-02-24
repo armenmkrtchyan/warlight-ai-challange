@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @author armen.mkrtchyan
  */
-public class MapAnalysisImpl {
+public class MapAnalysisImpl implements MapAnalysis {
 
     private final SuperGraph superGraph;
 
@@ -25,7 +25,7 @@ public class MapAnalysisImpl {
             AdjacencyList adjacencyList = superGraph.getMinBranching(region.getId(), region.getSuperRegionId());
             adjacencyList.getTotalWeight();
         }
+        return null;
     }
-
 
 }

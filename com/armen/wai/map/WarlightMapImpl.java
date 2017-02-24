@@ -4,13 +4,7 @@ import com.armen.wai.util.Settings;
 import com.armen.wai.util.SuperGraph;
 import com.armen.wai.util.helper.Node;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -82,7 +76,9 @@ public class WarlightMapImpl implements WarlightMap {
             }
             case "wastelands": {
                 List<String> configs = Arrays.asList(config.split(" "));
-                wastelands = configs.stream().map(Integer::parseInt).collect(Collectors.toSet());
+                wastelands = configs.stream()
+                        .map(Integer::parseInt)
+                        .collect(Collectors.toSet());
                 break;
             }
             case "opponent_starting_regions": {
@@ -182,4 +178,23 @@ public class WarlightMapImpl implements WarlightMap {
         }
     }
 
+    public Collection<Region> getRegionsByIds(String config) {
+        return Arrays.asList(config.split(" "))
+                .stream()
+                .map(regionId -> getRegionById(Integer.parseInt(regionId)))
+                .collect(Collectors.toList());
+    }
+
+    private Region getRegionById(Integer regionid) {
+        return this.regions
+                .stream()
+                .filter(region -> region.getId().equals(regionid))
+                .collect(Collectors.toList())
+                .get(0);
+    }
+
+    @Override
+    public SuperGraph getSuperGraph() {
+        return superGraph;
+    }
 }
