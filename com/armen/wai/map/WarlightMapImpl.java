@@ -95,8 +95,16 @@ public class WarlightMapImpl implements WarlightMap {
 
 
     @Override
-    public void update(String configKey, String config) {
+    public void update(String config) {
+        List<String> configs = Arrays.asList(config.split(" "));
 
+        for (int i = 0; i < configs.size() - 2; i += 3) {
+            Integer id = Integer.parseInt(configs.get(i));
+            String botName = configs.get(i + 1);
+            Integer armiesReward = Integer.parseInt(configs.get(i + 2));
+
+            // TODO: do update
+        }
     }
 
     private List<SuperRegion> createSuperRegions(String config) {
@@ -104,8 +112,8 @@ public class WarlightMapImpl implements WarlightMap {
         List<SuperRegion> superRegions = new ArrayList<>(configs.size() / 2);
 
         for (int i = 0; i < configs.size() - 1; i += 2) {
-            int id = Integer.parseInt(configs.get(i));
-            int armiesReward = Integer.parseInt(configs.get(i + 1));
+            Integer id = Integer.parseInt(configs.get(i));
+            Integer armiesReward = Integer.parseInt(configs.get(i + 1));
 
             superRegions.add(new SuperRegion(id, armiesReward));
         }
@@ -118,8 +126,8 @@ public class WarlightMapImpl implements WarlightMap {
         List<Region> regions = new ArrayList<>(configs.size() / 2);
 
         for (int i = 0; i < configs.size() - 1; i += 2) {
-            int id = Integer.parseInt(configs.get(i));
-            int superRegionId = Integer.parseInt(configs.get(i + 1));
+            Integer id = Integer.parseInt(configs.get(i));
+            Integer superRegionId = Integer.parseInt(configs.get(i + 1));
 
             regions.add(new Region(id, superRegionId));
         }

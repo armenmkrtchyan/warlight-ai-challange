@@ -13,7 +13,7 @@ public interface WarlightMap {
 
     void finalSetup();
 
-    void update(String configKey, String config);
+    void update(String config);
 
     void settings(String[] configLine);
 
