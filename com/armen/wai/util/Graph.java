@@ -23,6 +23,6 @@ public class Graph {
     }
 
     public Collection<Node> getNodes() {
-        return nodes;
+        return null;
     }
 }

@@ -5,8 +5,8 @@ package com.armen.wai.map;
  */
 public interface WarlightMap {
 
-    void setup(String configLine);
+    void setup(String configKey, String config);
 
-    void update(String configLine);
+    void update(String configKey, String config);
 
 }
