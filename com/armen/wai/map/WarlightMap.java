@@ -9,4 +9,6 @@ public interface WarlightMap {
 
     void update(String configKey, String config);
 
+    void settings(String[] configLine);
+
 }

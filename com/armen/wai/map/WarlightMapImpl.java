@@ -1,5 +1,7 @@
 package com.armen.wai.map;
 
+import com.armen.wai.util.Settings;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -87,6 +89,37 @@ public class WarlightMapImpl implements WarlightMap {
         }
 
         return parsedNeighborsMap;
+    }
+
+    @Override
+    public void settings(String[] configLine) {
+        Settings settings = new Settings();
+        switch (configLine[0]) {
+            case "timebank":
+                settings.setTimeBank(Long.valueOf(configLine[1]));
+                break;
+            case "time_per_move":
+                settings.setTimePerMove(Integer.valueOf(configLine[1]));
+                break;
+            case "max_rounds":
+                settings.setMaxRounds(Integer.valueOf(configLine[1]));
+                break;
+            case "your_bot":
+                settings.setYourBot(configLine[1]);
+                break;
+            case "opponent_bot":
+                settings.setOpponentBot(configLine[1]);
+                break;
+            case "starting_regions":
+                ArrayList<Integer> startingRegions = new ArrayList<>();
+                for(int i = 1; i < configLine.length; i++) {
+                    startingRegions.add(Integer.valueOf(configLine[i]));
+                }
+                settings.setStartingRegions(startingRegions);
+                break;
+            case "starting_pick_amount":
+                settings.setStartingPickAmount(Integer.valueOf(configLine[1]));
+        }
     }
 
 }
