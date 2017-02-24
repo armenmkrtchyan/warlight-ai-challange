@@ -15,13 +15,11 @@ import com.armen.wai.analytics.MapAnalysisImpl;
 import com.armen.wai.map.Region;
 import com.armen.wai.map.WarlightMap;
 import com.armen.wai.map.WarlightMapImpl;
-import com.armen.wai.move.AttackTransferMove;
 import com.armen.wai.move.Deployment;
-import com.armen.wai.strategies.DeploymentStrategyImpl;
 import com.armen.wai.strategies.DeploymentStrategy;
+import com.armen.wai.strategies.DeploymentStrategyImpl;
 import com.armen.wai.util.Settings;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
@@ -34,7 +32,6 @@ public class BotParser {
 
     private final static Pattern configPattern = Pattern.compile("([\\w_]+)\\s([\\w_]+)\\s+(.+)");
 
-    private BotState currentState;
     private final Settings settings = new Settings();
     private final WarlightMap warlightMap = new WarlightMapImpl(settings);
     private MapAnalysis mapAnalysis;
@@ -43,7 +40,6 @@ public class BotParser {
 
     public BotParser() {
         this.scan = new Scanner(System.in);
-        this.currentState = new BotState();
     }
 
     public void run() {
@@ -74,9 +70,6 @@ public class BotParser {
                         sysOutDeploys(deploymentStrategy.getDeployments(mapAnalysis));
                     } else if (parts.group(2).equals("attack/transfer")) {
                         //attack/transfer
-                        ArrayList<AttackTransferMove> attackTransferMoves = null;
-                        for (AttackTransferMove move : attackTransferMoves)
-                            output = output.concat(move.getString() + ",");
                     }
                     if (output.length() > 0)
                         System.out.println(output);
