@@ -1,6 +1,8 @@
 package com.armen.wai.util;
 
+import com.armen.wai.util.algorithm.EdmondsChuLiu;
 import com.armen.wai.util.helper.AdjacencyList;
+import com.armen.wai.util.helper.Node;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +33,15 @@ public class SuperGraph extends AdjacencyList {
 
     public Map<Integer, AdjacencyList> getSubGraphs() {
         return subGraphs;
+    }
+
+
+    public AdjacencyList getSubGraph(Integer groupKey) {
+        return subGraphs.get(groupKey);
+    }
+
+    public AdjacencyList getMinBranching(Integer root, Integer subGraphGroup) {
+        return new EdmondsChuLiu().getMinBranching(new Node(root), getSubGraph(subGraphGroup).clone());
     }
 
 

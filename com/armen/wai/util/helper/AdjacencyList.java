@@ -126,6 +126,12 @@ public class AdjacencyList implements Cloneable {
         return newlist;
     }
 
+    public Integer getTotalWeight() {
+        final int[] sum = {0};
+        getAllEdges().forEach(edge -> sum[0] += edge.getWeight());
+        return sum[0];
+    }
+
     /**
      *
      * @return
