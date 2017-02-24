@@ -1,5 +1,6 @@
 package com.armen.wai.map;
 
+import com.armen.wai.util.Settings;
 import com.armen.wai.util.SuperGraph;
 import com.armen.wai.util.helper.Node;
 
@@ -10,9 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.armen.wai.util.Settings;
-
-import java.util.*;
 import java.util.stream.Collectors;
 
 /**

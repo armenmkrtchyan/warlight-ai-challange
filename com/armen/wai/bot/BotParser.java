@@ -14,7 +14,6 @@ import com.armen.wai.map.Region;
 import com.armen.wai.map.WarlightMap;
 import com.armen.wai.map.WarlightMapImpl;
 import com.armen.wai.move.AttackTransferMove;
-import com.armen.wai.move.PlaceArmiesMove;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -60,10 +59,6 @@ public class BotParser {
                     //we need to do a move
                     String output = "";
                     if (parts.group(2).equals("place_armies")) {
-                        //place armies
-                        ArrayList<PlaceArmiesMove> placeArmiesMoves = null;
-                        for (PlaceArmiesMove move : placeArmiesMoves)
-                            output = output.concat(move.getString() + ",");
                     } else if (parts.group(2).equals("attack/transfer")) {
                         //attack/transfer
                         ArrayList<AttackTransferMove> attackTransferMoves = null;
