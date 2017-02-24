@@ -16,17 +16,17 @@ public class BFS {
     /**
      * Get closest enemy node object and distance
      */
-    public Pair<Node,Integer> closestEnemy(Node node, SuperGraph graph){
+    public Pair<Node, Integer> closestEnemy(Node node, SuperGraph graph) {
 
         Queue<Node> queue = new LinkedList<>();
         Map<Node, Boolean> visited = new HashMap<>();
 
         queue.add(node);
-        Map<Node,Integer> dist = new HashMap<>();
-        dist.put(node,0);
-        visited.put(node,true);
+        Map<Node, Integer> dist = new HashMap<>();
+        dist.put(node, 0);
+        visited.put(node, true);
 
-        while (!queue.isEmpty()){
+        while (!queue.isEmpty()) {
 
             Node temp = queue.poll();
             List<Edge> adjacent = graph.getAdjacent(temp);
