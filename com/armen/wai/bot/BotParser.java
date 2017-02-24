@@ -41,7 +41,6 @@ public class BotParser {
 
     private final Settings settings = new Settings();
     private final WarlightMap warlightMap = new WarlightMapImpl(settings);
-    private final DeploymentStrategy deploymentStrategy = new DeploymentStrategyImpl();
     private final MoveStrategy moveStrategy = new MoveStrategyImpl();
     private MapAnalysis mapAnalysis = new MapAnalysisImpl(warlightMap.getSuperGraph(), warlightMap);
     private final DeploymentStrategy deploymentStrategy = new DeploymentStrategyImpl(mapAnalysis);
@@ -75,7 +74,7 @@ public class BotParser {
                         if (mapAnalysis == null) {
                             throw new IllegalStateException("Something goes wrong in starting picks");
                         }
-                        sysOutDeploys(deploymentStrategy.getDeployments(mapAnalysis));
+                        sysOutDeploys(deploymentStrategy.getDeployments());
                     } else if (parts.group(2).equals("attack/transfer")) {
                         if (mapAnalysis == null) {
                             throw new IllegalStateException("Something goes wrong in starting picks");
