@@ -30,16 +30,13 @@ public class BotParser {
 
     private final static Pattern configPattern = Pattern.compile("([\\w_]+)\\s([\\w_]+)\\s+(.+)");
 
-    final Bot bot;
-
     BotState currentState;
     private final WarlightMap warlightMap = new WarlightMapImpl();
     private MapAnalysis mapAnalysis;
     private List<Region> suggestedRegions;
 
-    public BotParser(Bot bot) {
+    public BotParser() {
         this.scan = new Scanner(System.in);
-        this.bot = bot;
         this.currentState = new BotState();
     }
 
