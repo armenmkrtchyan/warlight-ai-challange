@@ -6,7 +6,7 @@ import com.armen.wai.map.WarlightMapImpl;
 /**
  * Created by Anushavan on 2/24/17.
  */
-public class main {
+public class Main {
 
     public static void main(String[] args) {
         WarlightMap warlightMap = new WarlightMapImpl();
