@@ -16,6 +16,9 @@ import com.armen.wai.map.Region;
 import com.armen.wai.map.WarlightMap;
 import com.armen.wai.map.WarlightMapImpl;
 import com.armen.wai.move.AttackTransferMove;
+import com.armen.wai.move.Deployment;
+import com.armen.wai.strategies.DeploymentStrategyImpl;
+import com.armen.wai.strategies.DeploymentStrategy;
 import com.armen.wai.util.Settings;
 
 import java.util.ArrayList;
@@ -36,6 +39,7 @@ public class BotParser {
     private final WarlightMap warlightMap = new WarlightMapImpl(settings);
     private MapAnalysis mapAnalysis;
     private List<Region> suggestedRegions;
+    private DeploymentStrategy deploymentStrategy = new DeploymentStrategyImpl();
 
     public BotParser() {
         this.scan = new Scanner(System.in);
@@ -64,6 +68,10 @@ public class BotParser {
                     //we need to do a move
                     String output = "";
                     if (parts.group(2).equals("place_armies")) {
+                        if (mapAnalysis == null) {
+                            throw new IllegalStateException("Something goes wrong in starting picks");
+                        }
+                        sysOutDeploys(deploymentStrategy.getDeployments(mapAnalysis));
                     } else if (parts.group(2).equals("attack/transfer")) {
                         //attack/transfer
                         ArrayList<AttackTransferMove> attackTransferMoves = null;
@@ -92,6 +100,17 @@ public class BotParser {
             }
         }
         warlightMap.finalSetup();
+    }
+
+    private void sysOutDeploys(Collection<Deployment> deployments) {
+        String output = "";
+        String botName = settings.getYourBot();
+
+        for (Deployment deployment : deployments) {
+            output += botName + " place_armies " + deployment.getRegion().getId() + " " + deployment.getArmies() + ", ";
+        }
+
+        System.out.println(output.trim());
     }
 
 }
