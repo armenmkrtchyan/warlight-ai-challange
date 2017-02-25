@@ -112,6 +112,12 @@ public class WarlightMapImpl implements WarlightMap {
         return regions;
     }
 
+
+    @Override
+    public Integer superRegionId(Integer regionId) {
+        return regions.stream();
+    }
+
     @Override
     public void update(String config) {
         String[] configs = config.split(" ");

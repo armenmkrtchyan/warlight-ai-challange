@@ -91,8 +91,7 @@ public class BotParser {
                     if (parts.group(1).equals("setup_map")) {
                         warlightMap.setup(parts.group(2), parts.group(3));
                     } else if (parts.group(1).equals("update_map")) {
-                        //all visible regions are given
-                        //				currentState.updateMap(parts.group(2));
+                        warlightMap.update(parts.group(2));
                     } else if (parts.group(1).equals("opponent_moves")) {
                         //all visible opponent moves are given
                         //				currentState.readOpponentMoves(parts);

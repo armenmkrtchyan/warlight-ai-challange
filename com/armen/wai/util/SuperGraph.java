@@ -6,6 +6,7 @@ import com.armen.wai.util.helper.Node;
 import com.armen.wai.util.helper.OwnerType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,12 +44,16 @@ public class SuperGraph extends AdjacencyList {
 
     public AdjacencyList getMinBranching(Integer root, Integer subGraphGroup) {
         AdjacencyList adjacencyList = getSubGraph(subGraphGroup).clone();
-        adjacencyList.removeTargets(adjacencyList.getSourceNodeSet()
-                .stream()
-                .filter(node -> node.getOwnerType().equals(OwnerType.Self))
-                .collect(Collectors.toList()));
+        adjacencyList.removeTargets(getSelfNodes(adjacencyList));
         return new EdmondsChuLiu().getMinBranching(new Node(root),
                 adjacencyList);
+    }
+
+    public List<Node> getSelfNodes(AdjacencyList adjacencyList) {
+        return adjacencyList.getSourceNodeSet()
+                .stream()
+                .filter(node -> node.getOwnerType().equals(OwnerType.Self))
+                .collect(Collectors.toList());
     }
 
 

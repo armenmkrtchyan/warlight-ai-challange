@@ -24,7 +24,7 @@ public class DeploymentStrategyImpl implements DeploymentStrategy {
     public Collection<Deployment> getDeployments() {
         List<Region> orderedRegions
                 = mapAnalysis.suggestDeploymentRegions();
-        List<Deployment> deployments
+        List<Deployment> deployments =
         return null;
     }
 

@@ -22,4 +22,6 @@ public interface WarlightMap {
 
     List<Region> getAllRegions();
 
+    Integer superRegionId(Integer regionId);
+
 }
