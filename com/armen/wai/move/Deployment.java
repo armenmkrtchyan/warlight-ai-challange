@@ -9,6 +9,6 @@ public interface Deployment {
 
     Integer getArmies();
 
-    Region getRegion();
+    Integer getRegion();
 
 }

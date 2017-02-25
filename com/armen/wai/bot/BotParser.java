@@ -11,7 +11,6 @@
 package com.armen.wai.bot;
 
 import com.armen.wai.analytics.BattleAnalysis;
-import com.armen.wai.analytics.BattleAnalysisImpl;
 import com.armen.wai.analytics.MapAnalysis;
 import com.armen.wai.analytics.MapAnalysisImpl;
 import com.armen.wai.map.Region;
@@ -23,8 +22,6 @@ import com.armen.wai.strategies.DeploymentStrategy;
 import com.armen.wai.strategies.DeploymentStrategyImpl;
 import com.armen.wai.strategies.MoveStrategy;
 import com.armen.wai.strategies.MoveStrategyImpl;
-import com.armen.wai.strategies.DeploymentStrategy;
-import com.armen.wai.strategies.DeploymentStrategyImpl;
 import com.armen.wai.util.Settings;
 
 import java.util.Collection;
@@ -43,7 +40,8 @@ public class BotParser {
     private final WarlightMap warlightMap = new WarlightMapImpl(settings);
     private final MoveStrategy moveStrategy = new MoveStrategyImpl();
     private MapAnalysis mapAnalysis = new MapAnalysisImpl(warlightMap.getSuperGraph(), warlightMap);
-    private final DeploymentStrategy deploymentStrategy = new DeploymentStrategyImpl(mapAnalysis);
+    private final DeploymentStrategy deploymentStrategy = new DeploymentStrategyImpl(mapAnalysis,
+            battleAnalysis);
     private BattleAnalysis battleAnalysis;
     private List<Region> suggestedRegions;
 

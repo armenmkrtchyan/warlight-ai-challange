@@ -22,7 +22,7 @@ public class DeploymentImpl implements Deployment {
     }
 
     @Override
-    public Region getRegion() {
+    public Integer getRegion() {
         return regions;
     }
 

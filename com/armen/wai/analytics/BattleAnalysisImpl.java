@@ -10,8 +10,8 @@ import com.armen.wai.util.helper.Edge;
 import com.armen.wai.util.helper.Node;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author armen.mkrtchyan
@@ -31,23 +31,24 @@ public class BattleAnalysisImpl implements BattleAnalysis {
         List<Deployment> deployments = new ArrayList<>();
         List<Node> selfNodes = superGraph.getSelfNodes(superGraph);
         BFS bfs = new BFS();
-        List<Integer> regionIds = new ArrayList<>();
+        HashSet<Integer> registeredNodes = new HashSet<>();
         for (Node selfNode : selfNodes) {
             if (bfs.closestEnemy(selfNode, superGraph).getValue() == 0) {
-                deployments.add(new DeploymentImpl(selfNode, maxNeededDeploymentForRegion()));
+                deployments.add(new DeploymentImpl(selfNode.getId(),
+                        maxNeededDeploymentForRegion(warlightMap.superRegionId(selfNode.getId()))));
+                registeredNodes.add(selfNode.getId());
             }
         }
-        List<Region> regions = regionIds.stream().map(warlightMap.getAllRegions())
-        regionIds.addAll(orderedRegions.stream().map(Region::getId).collect(Collectors.toList()));
-        for (Integer regionId : regionIds) {
-            deployments.add(new DeploymentImpl(regionId, maxNeededDeploymentForRegion(regionId)));
-        }
-        return;
+        orderedRegions.stream()
+                .filter(region -> !registeredNodes.contains(region.getId()))
+                .forEachOrdered(region -> deployments.add(new DeploymentImpl(region.getId(),
+                        maxNeededDeploymentForRegion(region.getSuperRegionId()))));
+        return deployments;
     }
 
-    private Integer maxNeededDeploymentForRegion(Region regionId) {
-        List<Edge> edges = superGraph.getSubGraph(regionId.getSuperRegionId())
-                .getAdjacent(new Node(regionId.getId()));
+    private Integer maxNeededDeploymentForRegion(Integer superRegionId) {
+        List<Edge> edges = superGraph.getSubGraph(superRegionId)
+                .getAdjacent(new Node(superRegionId));
 
         int neededDeployment = 0;
         for (Edge edge : edges) {

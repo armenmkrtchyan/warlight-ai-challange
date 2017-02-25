@@ -1,7 +1,7 @@
 package com.armen.wai.strategies;
 
+import com.armen.wai.analytics.BattleAnalysis;
 import com.armen.wai.analytics.MapAnalysis;
-import com.armen.wai.analytics.MapAnalysisImpl;
 import com.armen.wai.map.Region;
 import com.armen.wai.move.Deployment;
 
@@ -14,9 +14,11 @@ import java.util.List;
 public class DeploymentStrategyImpl implements DeploymentStrategy {
 
     private final MapAnalysis mapAnalysis;
+    private final BattleAnalysis battleAnalysis;
 
-    public DeploymentStrategyImpl(MapAnalysis mapAnalysis) {
+    public DeploymentStrategyImpl(MapAnalysis mapAnalysis, BattleAnalysis battleAnalysis) {
         this.mapAnalysis = mapAnalysis;
+        this.battleAnalysis = battleAnalysis;
     }
 
 
@@ -24,8 +26,7 @@ public class DeploymentStrategyImpl implements DeploymentStrategy {
     public Collection<Deployment> getDeployments() {
         List<Region> orderedRegions
                 = mapAnalysis.suggestDeploymentRegions();
-        List<Deployment> deployments =
-        return null;
+        return battleAnalysis.suggestDeployment(orderedRegions);
     }
 
     @Override

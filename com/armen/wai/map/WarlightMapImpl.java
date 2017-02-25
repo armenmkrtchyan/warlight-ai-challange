@@ -115,7 +115,11 @@ public class WarlightMapImpl implements WarlightMap {
 
     @Override
     public Integer superRegionId(Integer regionId) {
-        return regions.stream();
+        return regions.stream()
+                .filter(region -> region.getId().equals(regionId))
+                .findFirst()
+                .orElseThrow(RuntimeException::new)
+                .getSuperRegionId();
     }
 
     @Override
