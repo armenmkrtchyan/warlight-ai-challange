@@ -67,7 +67,8 @@ public class BattleAnalysisImpl implements BattleAnalysis {
         for (Node selfNode : selfNodes) {
             List<Edge> adjacencies = superGraph.getAdjacent(selfNode);
             for (Edge adjacency : adjacencies) {
-                if (adjacency.getTo().getOwnerType().equals(OwnerType.Neutral)) {
+                if (adjacency.getTo().getOwnerType().equals(OwnerType.Neutral)
+                        && canAttack(adjacency.getFrom(), adjacency.getTo())) {
                     Integer startRegionId = selfNode.getId();
                     Integer endRegionId = adjacency.getTo().getId();
                     moves.add(new MoveImpl(startRegionId, endRegionId, adjacency.getWeight()));
@@ -76,5 +77,9 @@ public class BattleAnalysisImpl implements BattleAnalysis {
         }
 
         return moves;
+    }
+
+    private boolean canAttack(Node from, Node to) {
+        return Math.round(3 * from.getArmies() / 5) >= to.getArmies();
     }
 }

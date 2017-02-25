@@ -33,7 +33,6 @@ public class WarlightMapImpl implements WarlightMap {
         this.settings = settings;
     }
 
-
     private void configureNeighbours() {
         for (Map.Entry<Integer, List<Integer>> neighbourEntry : neighbours.entrySet()) {
             for (Integer neighbourIds : neighbourEntry.getValue()) {
@@ -46,7 +45,6 @@ public class WarlightMapImpl implements WarlightMap {
                         getWeight(currentiId, wastelands));
             }
         }
-
     }
 
     private void configureSubRegions() {
@@ -57,7 +55,6 @@ public class WarlightMapImpl implements WarlightMap {
         }
         superGraph.groupAll(group);
     }
-
 
     private int getWeight(Integer id, Set<Integer> wastelands) {
         return wastelands.contains(id) ? 6 : 2;
@@ -90,7 +87,6 @@ public class WarlightMapImpl implements WarlightMap {
                 wastelands = configs.stream()
                         .map(Integer::parseInt)
                         .collect(Collectors.toSet());
-
                 break;
             }
             case "opponent_starting_regions": {
@@ -103,8 +99,6 @@ public class WarlightMapImpl implements WarlightMap {
             default:
                 throw new IllegalStateException("Unrecognized configuration");
         }
-
-
     }
 
     @Override
@@ -129,7 +123,7 @@ public class WarlightMapImpl implements WarlightMap {
             Integer id = Integer.parseInt(configs[i]);
             String botName = configs[i + 1];
             Integer armiesCount = Integer.parseInt(configs[i + 2]);
-            superGraph.setAdjacencyWeight(id, getNeededMinArmies(armiesCount));
+            superGraph.setAdjacencyWeight(id, armiesCount);
             superGraph.updateOwnership(id,
                     botName.equals(settings.getYourBot()) ? OwnerType.Self : OwnerType.Enemy);
         }
@@ -183,7 +177,6 @@ public class WarlightMapImpl implements WarlightMap {
         return parsedNeighborsMap;
     }
 
-
     public Collection<Region> getRegionsByIds(String config) {
         return Arrays.asList(config.split(" "))
                 .stream()
@@ -197,10 +190,6 @@ public class WarlightMapImpl implements WarlightMap {
                 .filter(region -> region.getId().equals(regionid))
                 .collect(Collectors.toList())
                 .get(0);
-    }
-
-    private int getNeededMinArmies(int armiesCount) {
-        return Math.round(5 * armiesCount / 3);
     }
 
     @Override

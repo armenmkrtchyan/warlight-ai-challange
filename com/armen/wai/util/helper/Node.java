@@ -39,6 +39,7 @@ public class Node implements Comparable<Node>, Cloneable {
     private int index = -1;            // used for Tarjan's algorithm
     private final int id;
     private OwnerType ownerType = OwnerType.Unknown;
+    private int armies;
 
     /**
      * 
@@ -130,6 +131,14 @@ public class Node implements Comparable<Node>, Cloneable {
      */
     public void setIndex(int index) {
         this.index = index;
+    }
+
+    public int getArmies() {
+        return armies;
+    }
+
+    public void setArmies(int armies) {
+        this.armies = armies;
     }
 
     @Override

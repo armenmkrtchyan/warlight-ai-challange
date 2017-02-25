@@ -93,12 +93,18 @@ public class AdjacencyList implements Cloneable {
 
     }
 
-    public void setAdjacencyWeight(Integer targetId, int weight) {
+    public void setAdjacencyWeight(Integer targetId, int armies) {
         Node target = new Node(targetId);
         getAllEdges().stream()
                 .filter(edge -> edge.getTo().getId() == targetId)
-                .forEach(edge -> edge.setWeight(weight));
+                .forEach(edge -> {
+                    edge.getFrom().setArmies(armies);
+                    edge.setWeight(getNeededMinArmies(armies));
+                });
+    }
 
+    private int getNeededMinArmies(int armiesCount) {
+        return Math.round(5 * armiesCount / 3);
     }
 
     /**
