@@ -15,7 +15,7 @@ public class MoveStrategyImpl implements MoveStrategy {
 
     @Override
     public List<Move> getMoves(BattleAnalysis battleAnalysis, MapAnalysis mapAnalysis) {
-        return null;
+        return battleAnalysis.suggestMoves();
     }
 
 }

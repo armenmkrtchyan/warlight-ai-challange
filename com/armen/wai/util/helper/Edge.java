@@ -50,7 +50,7 @@ public class Edge implements Comparable<Edge>, Cloneable {
     }
 
     /**
-     * 
+     *
      * @param argEdge
      * @return
      */
@@ -60,7 +60,7 @@ public class Edge implements Comparable<Edge>, Cloneable {
     }
 
     /**
-     * 
+     *
      * @param otherObject
      * @return
      */

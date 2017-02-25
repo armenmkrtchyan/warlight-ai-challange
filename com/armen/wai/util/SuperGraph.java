@@ -32,11 +32,9 @@ public class SuperGraph extends AdjacencyList {
         }
     }
 
-
     public Map<Integer, AdjacencyList> getSubGraphs() {
         return subGraphs;
     }
-
 
     public AdjacencyList getSubGraph(Integer groupKey) {
         return subGraphs.get(groupKey);
@@ -55,7 +53,6 @@ public class SuperGraph extends AdjacencyList {
                 .filter(node -> node.getOwnerType().equals(OwnerType.Self))
                 .collect(Collectors.toList());
     }
-
 
     public void updateOwnership(Set<Integer> id, OwnerType ownerType) {
         getSourceNodeSet().stream()

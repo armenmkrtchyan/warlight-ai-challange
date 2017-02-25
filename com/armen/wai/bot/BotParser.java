@@ -11,6 +11,7 @@
 package com.armen.wai.bot;
 
 import com.armen.wai.analytics.BattleAnalysis;
+import com.armen.wai.analytics.BattleAnalysisImpl;
 import com.armen.wai.analytics.MapAnalysis;
 import com.armen.wai.analytics.MapAnalysisImpl;
 import com.armen.wai.map.Region;
@@ -39,10 +40,10 @@ public class BotParser {
     private final Settings settings = new Settings();
     private final WarlightMap warlightMap = new WarlightMapImpl(settings);
     private final MoveStrategy moveStrategy = new MoveStrategyImpl();
+    private BattleAnalysis battleAnalysis = new BattleAnalysisImpl(warlightMap.getSuperGraph(), warlightMap);
     private MapAnalysis mapAnalysis = new MapAnalysisImpl(warlightMap.getSuperGraph(), warlightMap);
     private final DeploymentStrategy deploymentStrategy = new DeploymentStrategyImpl(mapAnalysis,
             battleAnalysis);
-    private BattleAnalysis battleAnalysis;
     private List<Region> suggestedRegions;
 
     public BotParser() {
@@ -108,7 +109,7 @@ public class BotParser {
 
         for (Deployment deployment : deployments) {
             output += botName + " place_armies "
-                    + deployment.getRegion().getId() + " "
+                    + deployment.getRegion() + " "
                     + deployment.getArmies() + ", ";
         }
 
@@ -121,8 +122,8 @@ public class BotParser {
 
         for (Move move : moves) {
             output += botName + " attack/transfer "
-                    + move.getStartRegion().getId() + " "
-                    + move.getEndRegion().getId() + " "
+                    + move.getStartRegionId() + " "
+                    + move.getEndRegionId() + " "
                     + move.getArmies() + ", ";
         }
 

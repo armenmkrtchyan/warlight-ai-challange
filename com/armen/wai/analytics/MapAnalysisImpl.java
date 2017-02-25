@@ -58,7 +58,7 @@ public class MapAnalysisImpl implements MapAnalysis {
         return suggestRegionOrder(allRegions);
     }
 
-    public Set<Integer> getOwnNodes() {
+    private Set<Integer> getOwnNodes() {
         return superGraph.getSourceNodeSet()
                 .stream()
                 .filter(node -> !node.getOwnerType().equals(

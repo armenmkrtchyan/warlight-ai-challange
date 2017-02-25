@@ -1,7 +1,5 @@
 package com.armen.wai.move;
 
-import com.armen.wai.map.Region;
-
 /**
  * @author armen.mkrtchyan
  */
@@ -9,11 +7,11 @@ public class DeploymentImpl implements Deployment {
 
     private Integer armies;
 
-    private final Integer regions;
+    private final Integer region;
 
-    public DeploymentImpl(Integer regions, Integer armies) {
+    public DeploymentImpl(Integer region, Integer armies) {
         this.armies = armies;
-        this.regions = regions;
+        this.region = region;
     }
 
     @Override
@@ -23,7 +21,7 @@ public class DeploymentImpl implements Deployment {
 
     @Override
     public Integer getRegion() {
-        return regions;
+        return region;
     }
 
     public void setArmies(Integer armies) {

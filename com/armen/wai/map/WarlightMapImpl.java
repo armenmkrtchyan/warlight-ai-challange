@@ -129,7 +129,7 @@ public class WarlightMapImpl implements WarlightMap {
             Integer id = Integer.parseInt(configs[i]);
             String botName = configs[i + 1];
             Integer armiesCount = Integer.parseInt(configs[i + 2]);
-            superGraph.setAdjacencyWeight(id, armiesCount);
+            superGraph.setAdjacencyWeight(id, getNeededMinArmies(armiesCount));
             superGraph.updateOwnership(id,
                     botName.equals(settings.getYourBot()) ? OwnerType.Self : OwnerType.Enemy);
         }
@@ -197,6 +197,10 @@ public class WarlightMapImpl implements WarlightMap {
                 .filter(region -> region.getId().equals(regionid))
                 .collect(Collectors.toList())
                 .get(0);
+    }
+
+    private int getNeededMinArmies(int armiesCount) {
+        return Math.round(5 * armiesCount / 3);
     }
 
     @Override
