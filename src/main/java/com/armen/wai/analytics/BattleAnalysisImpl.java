@@ -150,6 +150,6 @@ public class BattleAnalysisImpl implements BattleAnalysis {
 
     private boolean canAttackToEnemy(Region from, Region to) {
         return Math.round(3 * (from.getDeployedArmies() - 1) / 5) >=
-                to.getDeployedArmies() + 2 * enemyAvailableArmies() / 5;
+                to.getDeployedArmies() + Math.round(2 * enemyAvailableArmies() / 5);
     }
 }
