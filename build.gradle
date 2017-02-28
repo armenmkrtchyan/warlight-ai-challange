@@ -1,0 +1,17 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'application'
+
+group = 'com.armen.wai'
+version = '1.0-SNAPSHOT'
+
+
+mainClassName = "com.armen.wai.bot.BotStarter"
+
+repositories {
+        
+     mavenCentral()
+}
+dependencies {
+    compile group: 'org.jgrapht', name: 'jgrapht-core', version:'1.0.1'
+}
