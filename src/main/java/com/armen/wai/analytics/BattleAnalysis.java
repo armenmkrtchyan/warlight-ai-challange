@@ -11,7 +11,6 @@ import java.util.List;
  */
 public interface BattleAnalysis {
 
-
     List<Deployment> suggestDeployment(List<Region> orderedRegions);
 
     List<Move> suggestMoves();

@@ -89,10 +89,11 @@ public class BotParser {
                         }
                         output = sysOutTransfers(moveStrategy.getMoves());
                     }
-                    if (output.length() > 0)
+                    if (output.length() > 0) {
                         System.out.println(output);
-                    else
+                    } else {
                         System.out.println("No moves");
+                    }
                 } else if (parts.group(1).equals("settings")) {
                     settings.setup(parts.group(3), parts.group(4));
                 } else {

@@ -142,15 +142,22 @@ public class BattleAnalysisImpl implements BattleAnalysis {
                 .stream()
                 .filter(region -> region.getDeployedArmies() > 2)
                 .forEach(region -> {
-                    Set<RegionEdge> regionEdges = mainGraph.edgesOf(region);
-                    for (RegionEdge edge : regionEdges) {
-                        if (canAttackToNeutral(region, edge.getTarget())) {
-                            moves.add(createMove(region, edge));
-                        } else if (canAttackToEnemy(region, edge.getTarget())) {
-                            moves.add(createMove(region, edge));
-                        }
-                    }
+                    moves.addAll(getMovesFrom(region));
                 });
+        return moves;
+    }
+
+    private List<Move> getMovesFrom(Region region) {
+        List<Move> moves = new ArrayList<>();
+
+        Set<RegionEdge> regionEdges = mainGraph.edgesOf(region);
+        for (RegionEdge edge : regionEdges) {
+            if (canAttackToNeutral(region, edge.getTarget())) {
+                moves.add(createMove(region, edge));
+            } else if (canAttackToEnemy(region, edge.getTarget())) {
+                moves.add(createMove(region, edge));
+            }
+        }
         return moves;
     }
 
