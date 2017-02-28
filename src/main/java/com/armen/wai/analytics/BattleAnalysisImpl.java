@@ -81,28 +81,11 @@ public class BattleAnalysisImpl implements BattleAnalysis {
         return neededDeployment;
     }
 
-    public List<Move> suggestMoves() {
-        List<Move> moves = new ArrayList<>();
-        Collection<Region> ownRegions = warlightMap.getRegionByOwner(OwnerType.Self);
-
-        for (Region region : ownRegions) {
-            Set<RegionEdge> regionEdges = mainGraph.edgesOf(region);
-            for (RegionEdge edge : regionEdges) {
-                if (edge.getTarget().getOwner().equals(OwnerType.Neutral)
-                        && canAttack(edge.getSource(), edge.getTarget())) {
-                    Integer startRegionId = region.getId();
-                    Integer endRegionId = edge.getTarget().getId();
-                    moves.add(new MoveImpl(startRegionId,
-                            endRegionId,
-                            Double.valueOf(mainGraph.getEdgeWeight(edge) + 1 ).intValue()));
-                }
-            }
-        }
-
-        return moves;
+    private Integer availableArmies() {
+        return settings.getStartingArmies();
     }
 
-    private Integer availableArmies() {
+    private Integer enemyAvailableArmies() {
         Integer availableArmies = settings.getStartingArmies();
         for (SuperRegion superRegion : warlightMap.getFullyOwnedSuperRegions()) {
             availableArmies += superRegion.getArmiesReward();
@@ -110,7 +93,59 @@ public class BattleAnalysisImpl implements BattleAnalysis {
         return availableArmies;
     }
 
-    private boolean canAttack(Region from, Region to) {
-        return Math.round(3 * (from.getDeployedArmies() - 1) / 5) >= to.getDeployedArmies();
+    public List<Move> suggestMoves() {
+        List<Move> moves = new ArrayList<>();
+        Collection<Region> ownRegions = warlightMap.getRegionByOwner(OwnerType.Self);
+
+        for (Region region : ownRegions) {
+            Set<RegionEdge> regionEdges = mainGraph.edgesOf(region);
+            for (RegionEdge edge : regionEdges) {
+                moves.addAll(getAttackedToNeutrals(region, edge));
+                moves.addAll(getAttackedToEnemies(region, edge));
+            }
+        }
+
+        return moves;
+    }
+
+    private List<Move> getAttackedToNeutrals(Region region, RegionEdge edge) {
+        List<Move> moves = new ArrayList<>();
+
+        if (edge.getTarget().getOwner().equals(OwnerType.Neutral)
+                && canAttackToNeutral(edge.getSource(), edge.getTarget())) {
+            moves.add(createMove(region, edge));
+        }
+
+        return moves;
+    }
+
+    private List<Move> getAttackedToEnemies(Region region, RegionEdge edge) {
+        List<Move> moves = new ArrayList<>();
+
+        if (edge.getTarget().getOwner().equals(OwnerType.Enemy)
+                && canAttackToEnemy(edge.getSource(), edge.getTarget())) {
+            moves.add(createMove(region, edge));
+        }
+
+        return moves;
+    }
+
+    private Move createMove(Region region, RegionEdge edge) {
+        Integer startRegionId = region.getId();
+        Integer endRegionId = edge.getTarget().getId();
+
+        return new MoveImpl(startRegionId,
+                endRegionId,
+                Double.valueOf(mainGraph.getEdgeWeight(edge) + 1 ).intValue());
+    }
+
+    private boolean canAttackToNeutral(Region from, Region to) {
+        return Math.round(3 * (from.getDeployedArmies() - 1) / 5) >=
+                to.getDeployedArmies();
+    }
+
+    private boolean canAttackToEnemy(Region from, Region to) {
+        return Math.round(3 * (from.getDeployedArmies() - 1) / 5) >=
+                to.getDeployedArmies() + 2 * enemyAvailableArmies() / 5;
     }
 }
