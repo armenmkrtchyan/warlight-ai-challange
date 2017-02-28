@@ -52,6 +52,4 @@ public class MapAnalysisImpl implements MapAnalysis {
         allRegions.removeIf(region -> !region.getOwner().equals(OwnerType.Self));
         return suggestRegionOrder(allRegions);
     }
-
-
 }
