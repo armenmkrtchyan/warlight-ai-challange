@@ -141,9 +141,7 @@ public class BattleAnalysisImpl implements BattleAnalysis {
         ownRegions
                 .stream()
                 .filter(region -> region.getDeployedArmies() > 2)
-                .forEach(region -> {
-                    moves.addAll(getMovesFrom(region));
-                });
+                .forEach(region -> moves.addAll(getMovesFrom(region)));
         return moves;
     }
 
@@ -151,13 +149,16 @@ public class BattleAnalysisImpl implements BattleAnalysis {
         List<Move> moves = new ArrayList<>();
 
         Set<RegionEdge> regionEdges = mainGraph.edgesOf(region);
-        for (RegionEdge edge : regionEdges) {
-            if (canAttackToNeutral(region, edge.getTarget())) {
-                moves.add(createMove(region, edge));
-            } else if (canAttackToEnemy(region, edge.getTarget())) {
-                moves.add(createMove(region, edge));
-            }
-        }
+        regionEdges
+                .stream()
+                .filter(edge -> !edge.getTarget().getOwner().equals(OwnerType.Self))
+                .forEach(edge -> {
+                    if (canAttackToNeutral(region, edge.getTarget())) {
+                        moves.add(createMove(region, edge));
+                    } else if (canAttackToEnemy(region, edge.getTarget())) {
+                        moves.add(createMove(region, edge));
+                    }
+                });
         return moves;
     }
 
