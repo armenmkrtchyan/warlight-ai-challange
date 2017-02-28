@@ -161,7 +161,9 @@ public class WarlightMapImpl implements WarlightMap {
                 .filter(region -> !region.getOwner().equals(OwnerType.Self))
                 .forEach(region -> superRegionIds.remove(region.getSuperRegionId()));
 
-        return superRegionIds.stream().map(superRegions::get).collect(Collectors.toList());
+        return superRegionIds.stream()
+                .map(superRegions::get)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -171,7 +173,9 @@ public class WarlightMapImpl implements WarlightMap {
                 .filter(region -> !region.getOwner().equals(OwnerType.Enemy))
                 .forEach(region -> superRegionIds.remove(region.getSuperRegionId()));
 
-        return superRegionIds.stream().map(superRegions::get).collect(Collectors.toList());
+        return superRegionIds.stream()
+                .map(superRegions::get)
+                .collect(Collectors.toList());
     }
 
     private void updateOwnership(Integer regionId, OwnerType ownerType) {

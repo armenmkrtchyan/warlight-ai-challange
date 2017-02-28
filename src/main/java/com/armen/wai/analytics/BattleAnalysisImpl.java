@@ -135,10 +135,11 @@ public class BattleAnalysisImpl implements BattleAnalysis {
     private Move createMove(Region region, RegionEdge edge) {
         Integer startRegionId = region.getId();
         Integer endRegionId = edge.getTarget().getId();
+        Integer armiesCount = Double.valueOf(mainGraph.getEdgeWeight(edge) + 1).intValue();
 
-        return new MoveImpl(startRegionId,
-                endRegionId,
-                Double.valueOf(mainGraph.getEdgeWeight(edge) + 1 ).intValue());
+        region.setDeployedArmies(region.getDeployedArmies() - armiesCount);
+
+        return new MoveImpl(startRegionId, endRegionId, armiesCount);
     }
 
     private boolean canAttackToNeutral(Region from, Region to) {
