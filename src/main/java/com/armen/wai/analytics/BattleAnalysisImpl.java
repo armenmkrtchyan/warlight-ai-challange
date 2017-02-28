@@ -10,14 +10,9 @@ import com.armen.wai.move.Move;
 import com.armen.wai.move.MoveImpl;
 import com.armen.wai.util.Settings;
 import com.armen.wai.util.helper.OwnerType;
-
 import org.jgrapht.DirectedGraph;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -41,9 +36,11 @@ public class BattleAnalysisImpl implements BattleAnalysis {
         final List<Deployment> deployments = new ArrayList<>();
         HashSet<Integer> registeredNodes = new HashSet<>();
         for (Region selfRegion : enemyNeighbourRegions(orderedRegions)) {
-            deployments.add(new DeploymentImpl(selfRegion.getId(),
-                    maxNeededDeploymentForRegion(selfRegion)));
-            registeredNodes.add(selfRegion.getId());
+            Integer neededArmiesForDefence = minNeededDeploymentForRegionDefence(selfRegion);
+            if (neededArmiesForDefence > 0) {
+                deployments.add(new DeploymentImpl(selfRegion.getId(), neededArmiesForDefence));
+                registeredNodes.add(selfRegion.getId());
+            }
         }
         final Integer[] availableArmies = {availableArmies()};
         orderedRegions.stream()
@@ -68,17 +65,49 @@ public class BattleAnalysisImpl implements BattleAnalysis {
                         Collectors.toList());
     }
 
+    private Integer minNeededDeploymentForRegionDefence(Region region) {
+        List<RegionEdge> regionEdges = mainGraph.edgesOf(region)
+                .stream()
+                .filter(regionEdge -> regionEdge.getTarget().getOwner().equals(OwnerType.Enemy))
+                .collect(Collectors.toList());
+
+        int enemyCount = regionEdges
+                .stream()
+                .map(RegionEdge::getTarget)
+                .mapToInt(Region::getDeployedArmies)
+                .max()
+                .getAsInt();
+
+        Integer armiesForDefence = minArmiesCountForDefence(enemyCount + Math.round(2 * enemyAvailableArmies() / 5));
+        Integer deployedArmies = region.getDeployedArmies();
+
+        return armiesForDefence <= deployedArmies ? 0 : armiesForDefence - deployedArmies;
+    }
+
+    private Integer minArmiesCountForDefence(int enemyCount) {
+        return 10 * enemyCount / 7;
+    }
+
     private Integer maxNeededDeploymentForRegion(Region region) {
         List<RegionEdge> regionEdges = mainGraph.edgesOf(region)
                 .stream()
                 .filter(regionEdge -> !regionEdge.getTarget().getOwner().equals(OwnerType.Self))
                 .collect(Collectors.toList());
 
-        int neededDeployment = 0;
+        List<Integer> neededDeployments = new ArrayList<>();
+
         for (RegionEdge edge : regionEdges) {
-            neededDeployment += mainGraph.getEdgeWeight(edge);
+            if (edge.getTarget().getOwner().equals(OwnerType.Neutral) &&
+                    canAttackToNeutral(region, edge.getTarget())) {
+                neededDeployments.add(0);
+            } else if (edge.getTarget().getOwner().equals(OwnerType.Enemy) &&
+                    canAttackToEnemy(region, edge.getTarget())) {
+                neededDeployments.add(0);
+            } else {
+                neededDeployments.add(Double.valueOf(mainGraph.getEdgeWeight(edge) + 1).intValue());
+            }
         }
-        return neededDeployment;
+        return Collections.min(neededDeployments);
     }
 
     private Integer availableArmies() {
@@ -99,33 +128,35 @@ public class BattleAnalysisImpl implements BattleAnalysis {
         List<Move> moves = new ArrayList<>();
         Collection<Region> ownRegions = warlightMap.getRegionByOwner(OwnerType.Self);
 
-        for (Region region : ownRegions) {
-            Set<RegionEdge> regionEdges = mainGraph.edgesOf(region);
-            for (RegionEdge edge : regionEdges) {
-                moves.addAll(getAttackedToNeutrals(region, edge));
-                moves.addAll(getAttackedToEnemies(region, edge));
-            }
-        }
+        ownRegions.stream()
+                .filter(region -> region.getDeployedArmies() > 2)
+                .forEach(region -> {
+                    Set<RegionEdge> regionEdges = mainGraph.edgesOf(region);
+                    for (RegionEdge edge : regionEdges) {
+                        moves.addAll(getMovesToNeutrals(region, edge));
+                        moves.addAll(getMovesToEnemies(region, edge));
+                    }
+                });
 
         return moves;
     }
 
-    private List<Move> getAttackedToNeutrals(Region region, RegionEdge edge) {
+    private List<Move> getMovesToNeutrals(Region region, RegionEdge edge) {
         List<Move> moves = new ArrayList<>();
 
         if (edge.getTarget().getOwner().equals(OwnerType.Neutral)
-                && canAttackToNeutral(edge.getSource(), edge.getTarget())) {
+                && canAttackToNeutral(region, edge.getTarget())) {
             moves.add(createMove(region, edge));
         }
 
         return moves;
     }
 
-    private List<Move> getAttackedToEnemies(Region region, RegionEdge edge) {
+    private List<Move> getMovesToEnemies(Region region, RegionEdge edge) {
         List<Move> moves = new ArrayList<>();
 
         if (edge.getTarget().getOwner().equals(OwnerType.Enemy)
-                && canAttackToEnemy(edge.getSource(), edge.getTarget())) {
+                && canAttackToEnemy(region, edge.getTarget())) {
             moves.add(createMove(region, edge));
         }
 
