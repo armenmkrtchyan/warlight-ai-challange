@@ -87,9 +87,11 @@ public class BattleAnalysisImpl implements BattleAnalysis {
 
     private Integer enemyAvailableArmies() {
         Integer availableArmies = settings.getStartingArmies();
-        for (SuperRegion superRegion : warlightMap.getFullyOwnedSuperRegions()) {
+
+        for (SuperRegion superRegion : warlightMap.getEnemyFullyOwnedSuperRegions()) {
             availableArmies += superRegion.getArmiesReward();
         }
+
         return availableArmies;
     }
 

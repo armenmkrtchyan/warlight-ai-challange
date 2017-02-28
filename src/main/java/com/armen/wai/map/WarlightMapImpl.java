@@ -157,11 +157,20 @@ public class WarlightMapImpl implements WarlightMap {
     @Override
     public Collection<SuperRegion> getFullyOwnedSuperRegions() {
         Collection<Integer> superRegionIds = new HashSet<>(superRegions.keySet());
-        for (Region region : regions) {
-            if (!region.getOwner().equals(OwnerType.Self)) {
-                superRegionIds.remove(region.getSuperRegionId());
-            }
-        }
+        regions.stream()
+                .filter(region -> !region.getOwner().equals(OwnerType.Self))
+                .forEach(region -> superRegionIds.remove(region.getSuperRegionId()));
+
+        return superRegionIds.stream().map(superRegions::get).collect(Collectors.toList());
+    }
+
+    @Override
+    public Collection<SuperRegion> getEnemyFullyOwnedSuperRegions() {
+        Collection<Integer> superRegionIds = new HashSet<>(superRegions.keySet());
+        regions.stream()
+                .filter(region -> !region.getOwner().equals(OwnerType.Enemy))
+                .forEach(region -> superRegionIds.remove(region.getSuperRegionId()));
+
         return superRegionIds.stream().map(superRegions::get).collect(Collectors.toList());
     }
 

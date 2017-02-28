@@ -35,6 +35,8 @@ public interface WarlightMap {
 
     Collection<SuperRegion> getFullyOwnedSuperRegions();
 
+    Collection<SuperRegion> getEnemyFullyOwnedSuperRegions();
+
     Integer superRegionId(Integer regionId);
 
 }
