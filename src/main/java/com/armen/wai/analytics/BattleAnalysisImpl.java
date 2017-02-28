@@ -138,6 +138,7 @@ public class BattleAnalysisImpl implements BattleAnalysis {
         Integer armiesCount = Double.valueOf(mainGraph.getEdgeWeight(edge) + 1).intValue();
 
         region.setDeployedArmies(region.getDeployedArmies() - armiesCount);
+        edge.getTarget().setOwner(OwnerType.Self);
 
         return new MoveImpl(startRegionId, endRegionId, armiesCount);
     }
