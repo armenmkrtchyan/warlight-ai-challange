@@ -140,7 +140,7 @@ public class BattleAnalysisImpl implements BattleAnalysis {
 
         ownRegions
                 .stream()
-                .filter(region -> region.getDeployedArmies() > 2)
+                .filter(region -> region.getDeployedArmies() > 3)
                 .forEach(region -> moves.addAll(getMovesFrom(region)));
         return moves;
     }
