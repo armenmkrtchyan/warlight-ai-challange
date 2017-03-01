@@ -55,9 +55,11 @@ public class BattleAnalysisImpl implements BattleAnalysis {
                     .forEachOrdered(region -> {
                         if (availableArmies[0] > 0) {
                             Integer needed = maxNeededDeploymentForRegion(region);
-                            deployments.add(new DeploymentImpl(region.getId(),
-                                    Math.min(availableArmies[0], needed)));
-                            availableArmies[0] -= needed;
+                            if (needed > 0) {
+                                deployments.add(new DeploymentImpl(region.getId(),
+                                        Math.min(availableArmies[0], needed)));
+                                availableArmies[0] -= needed;
+                            }
                         }
                     });
         }
@@ -211,10 +213,16 @@ public class BattleAnalysisImpl implements BattleAnalysis {
     private Move createMove(Region region, RegionEdge edge) {
         Integer startRegionId = region.getId();
         Integer endRegionId = edge.getTarget().getId();
-        Integer armiesCount = Double.valueOf(mainGraph.getEdgeWeight(edge) + 1).intValue();
+        Integer armiesCount;
 
-        region.setDeployedArmies(region.getDeployedArmies() - armiesCount);
         edge.getTarget().setOwner(OwnerType.Self);
+        if (areAllEdgesSelf(mainGraph.edgesOf(region))) {
+            armiesCount = region.getDeployedArmies() - 1;
+        } else {
+            armiesCount = Double.valueOf(mainGraph.getEdgeWeight(edge) + 1).intValue();
+        }
+        region.setDeployedArmies(region.getDeployedArmies() - armiesCount);
+
 
         return new MoveImpl(startRegionId, endRegionId, armiesCount);
     }
