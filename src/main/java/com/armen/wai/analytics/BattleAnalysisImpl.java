@@ -149,17 +149,51 @@ public class BattleAnalysisImpl implements BattleAnalysis {
         List<Move> moves = new ArrayList<>();
 
         Set<RegionEdge> regionEdges = mainGraph.edgesOf(region);
-        regionEdges
-                .stream()
-                .filter(edge -> !edge.getTarget().getOwner().equals(OwnerType.Self))
-                .forEach(edge -> {
-                    if (canAttackToNeutral(region, edge.getTarget())) {
-                        moves.add(createMove(region, edge));
-                    } else if (canAttackToEnemy(region, edge.getTarget())) {
-                        moves.add(createMove(region, edge));
-                    }
-                });
+        if (areAllEdgesSelf(regionEdges)) {
+            Integer transferRegionId = getTransferRegionId(regionEdges);
+            moves.add(new MoveImpl(region.getId(), transferRegionId, region.getDeployedArmies() - 1));
+        } else {
+            regionEdges
+                    .stream()
+                    .filter(edge -> !edge.getTarget().getOwner().equals(OwnerType.Self))
+                    .forEach(edge -> {
+                        if (canAttackToNeutral(region, edge.getTarget())) {
+                            moves.add(createMove(region, edge));
+                        } else if (canAttackToEnemy(region, edge.getTarget())) {
+                            moves.add(createMove(region, edge));
+                        }
+                    });
+        }
         return moves;
+    }
+
+    private boolean areAllEdgesSelf(Set<RegionEdge> regionEdges) {
+        return regionEdges
+                .stream()
+                .allMatch(regionEdge -> regionEdge.getTarget().getOwner().equals(OwnerType.Self));
+    }
+
+    private Integer getTransferRegionId(Set<RegionEdge> regionEdges) {
+        return regionEdges
+                .stream()
+                .filter(regionEdge -> mainGraph.edgesOf(regionEdge.getTarget())
+                        .stream()
+                        .anyMatch(edge -> edge.getTarget().getOwner().equals(OwnerType.Enemy)))
+                .map(regionEdge -> enemyNeighbourRegions(regionEdge.getTarget())
+                        .stream()
+                        .max((o1, o2) -> o1.getDeployedArmies().compareTo(o2.getDeployedArmies()))
+                        .get())
+                .max((o1, o2) -> o1.getDeployedArmies().compareTo(o2.getDeployedArmies()))
+                .get()
+                .getId();
+    }
+
+    private List<Region> enemyNeighbourRegions(Region region) {
+        return mainGraph.edgesOf(region)
+                .stream()
+                .filter(regionEdge -> regionEdge.getTarget().getOwner().equals(OwnerType.Enemy))
+                .map(RegionEdge::getTarget)
+                .collect(Collectors.toList());
     }
 
     private boolean canAttackToNeutral(Region from, Region to) {
