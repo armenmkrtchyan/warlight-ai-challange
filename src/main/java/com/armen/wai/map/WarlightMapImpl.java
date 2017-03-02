@@ -150,7 +150,9 @@ public class WarlightMapImpl implements WarlightMap {
     @Override
     public void update(Collection<Deployment> deployments) {
         for (Deployment deployment : deployments) {
-            updateDeployedArmiesCount(deployment.getRegion(), deployment.getArmies());
+            Integer regionId = deployment.getRegion();
+            Region region = getRegionById(regionId);
+            updateDeployedArmiesCount(regionId, region.getDeployedArmies() + deployment.getArmies());
         }
     }
 
