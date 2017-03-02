@@ -86,7 +86,7 @@ public class BattleAnalysisImpl implements BattleAnalysis {
                 .map(RegionEdge::getTarget)
                 .mapToInt(Region::getDeployedArmies)
                 .max()
-                .getAsInt();
+                .orElse(0);
 
         Integer armiesForDefence = minArmiesCountForDefence(enemyCount + Math.round(2 * enemyAvailableArmies() / 5));
         Integer deployedArmies = region.getDeployedArmies();
@@ -119,7 +119,7 @@ public class BattleAnalysisImpl implements BattleAnalysis {
                 neededDeployments.add(Double.valueOf(mainGraph.getEdgeWeight(edge) + 1).intValue());
             }
         }
-        return Collections.min(neededDeployments);
+        return neededDeployments.size() > 0 ? Collections.min(neededDeployments) : 0;
     }
 
     private Integer availableArmies() {
@@ -149,10 +149,12 @@ public class BattleAnalysisImpl implements BattleAnalysis {
 
     private List<Move> getMovesFrom(Region region) {
         List<Move> moves = new ArrayList<>();
-
         Set<RegionEdge> regionEdges = mainGraph.edgesOf(region);
-        if (areAllEdgesSelf(regionEdges)) {
-            Integer transferRegionId = getTransferRegionId(regionEdges);
+        Integer transferRegionId = areAllEdgesSelf(regionEdges)
+                ? getTransferRegionId(regionEdges)
+                : -1;
+
+        if (transferRegionId > -1) {
             moves.add(new MoveImpl(region.getId(), transferRegionId, region.getDeployedArmies() - 1));
         } else {
             regionEdges
@@ -176,7 +178,7 @@ public class BattleAnalysisImpl implements BattleAnalysis {
     }
 
     private Integer getTransferRegionId(Set<RegionEdge> regionEdges) {
-        return regionEdges
+        List<Region> transferRegions = regionEdges
                 .stream()
                 .filter(regionEdge -> mainGraph.edgesOf(regionEdge.getTarget())
                         .stream()
@@ -184,10 +186,12 @@ public class BattleAnalysisImpl implements BattleAnalysis {
                 .map(regionEdge -> enemyNeighbourRegions(regionEdge.getTarget())
                         .stream()
                         .max((o1, o2) -> o1.getDeployedArmies().compareTo(o2.getDeployedArmies()))
-                        .get())
-                .max((o1, o2) -> o1.getDeployedArmies().compareTo(o2.getDeployedArmies()))
-                .get()
-                .getId();
+                        .orElse(regionEdge.getTarget()))
+                .collect(Collectors.toList());
+
+        return transferRegions.size() > 0
+                ? Collections.max(transferRegions, (o1, o2) -> o1.getDeployedArmies().compareTo(o2.getDeployedArmies())).getId()
+                : -1;
     }
 
     private List<Region> enemyNeighbourRegions(Region region) {
@@ -213,16 +217,14 @@ public class BattleAnalysisImpl implements BattleAnalysis {
     private Move createMove(Region region, RegionEdge edge) {
         Integer startRegionId = region.getId();
         Integer endRegionId = edge.getTarget().getId();
-        Integer armiesCount;
+        Integer armiesCount = Double.valueOf(mainGraph.getEdgeWeight(edge) + 1).intValue();
+        Integer remainingArmies = region.getDeployedArmies() - armiesCount;
 
-        edge.getTarget().setOwner(OwnerType.Self);
-        if (areAllEdgesSelf(mainGraph.edgesOf(region))) {
+        if (remainingArmies < 4) {
             armiesCount = region.getDeployedArmies() - 1;
-        } else {
-            armiesCount = Double.valueOf(mainGraph.getEdgeWeight(edge) + 1).intValue();
         }
+        edge.getTarget().setOwner(OwnerType.Self);
         region.setDeployedArmies(region.getDeployedArmies() - armiesCount);
-
 
         return new MoveImpl(startRegionId, endRegionId, armiesCount);
     }

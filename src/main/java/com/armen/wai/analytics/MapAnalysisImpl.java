@@ -28,19 +28,19 @@ public class MapAnalysisImpl implements MapAnalysis {
 
     public List<Region> suggestRegionOrder(Collection<Region> regions) {
         List<Region> suggestion = new ArrayList<>(regions);
-        TreeMap<Integer, List<Region>> treeMap = new TreeMap<>(Comparator.reverseOrder());
+        TreeMap<Double, List<Region>> treeMap = new TreeMap<>(Comparator.reverseOrder());
 
         for (Region region : suggestion) {
             KruskalMinimumSpanningTree<Region, RegionEdge> spanningTreeAlgorithm = new KruskalMinimumSpanningTree<>(
                     warlightMap.getSuperRegionGraph(region.getSuperRegionId()));
             SpanningTreeAlgorithm.SpanningTree<RegionEdge> spanningTree = spanningTreeAlgorithm.getSpanningTree();
             int weight = Double.valueOf(spanningTree.getWeight()).intValue();
-            int key = weight / spanningTree.getEdges().size();
-            treeMap.computeIfAbsent(key, ArrayList::new);
+            double key = (1.5 * weight) / spanningTree.getEdges().size();
+            treeMap.computeIfAbsent(key, aDouble -> new ArrayList<>());
             treeMap.get(key).add(region);
         }
         ArrayList<Region> result = new ArrayList<>();
-        for (Map.Entry<Integer, List<Region>> entry : treeMap.entrySet()) {
+        for (Map.Entry<Double, List<Region>> entry : treeMap.entrySet()) {
             result.addAll(entry.getValue());
         }
         return result;
