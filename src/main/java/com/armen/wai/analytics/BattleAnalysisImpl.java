@@ -234,7 +234,7 @@ public class BattleAnalysisImpl implements BattleAnalysis {
     private List<Region> enemyNeighbourRegions(Region region) {
         return mainGraph.edgesOf(region)
                 .stream()
-                .filter(regionEdge -> regionEdge.getTarget().getOwner().equals(OwnerType.Enemy))
+                .filter(regionEdge -> !regionEdge.getTarget().getOwner().equals(OwnerType.Self))
                 .map(RegionEdge::getTarget)
                 .collect(Collectors.toList());
     }
