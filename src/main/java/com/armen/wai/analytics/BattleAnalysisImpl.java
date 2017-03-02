@@ -36,19 +36,19 @@ public class BattleAnalysisImpl implements BattleAnalysis {
         final List<Deployment> deployments = new ArrayList<>();
         HashSet<Integer> registeredNodes = new HashSet<>();
         final Integer[] availableArmies = {availableArmies()};
-        for (Region selfRegion : enemyNeighbourRegions(orderedRegions)) {
-            if (availableArmies[0] <= 0) {
-                break;
-            } else {
-                Integer needed = minNeededDeploymentForRegionDefence(selfRegion);
-                if (needed > 0) {
-                    deployments.add(new DeploymentImpl(selfRegion.getId(),
-                            Math.min(availableArmies[0], needed)));
-                    availableArmies[0] -= needed;
-                    registeredNodes.add(selfRegion.getId());
-                }
-            }
-        }
+//        for (Region selfRegion : enemyNeighbourRegions(orderedRegions)) {
+//            if (availableArmies[0] <= 0) {
+//                break;
+//            } else {
+//                Integer needed = minNeededDeploymentForRegionDefence(selfRegion);
+//                if (needed > 0) {
+//                    deployments.add(new DeploymentImpl(selfRegion.getId(),
+//                            Math.min(availableArmies[0], needed)));
+//                    availableArmies[0] -= needed;
+//                    registeredNodes.add(selfRegion.getId());
+//                }
+//            }
+//        }
         if (availableArmies[0] > 0) {
             orderedRegions.stream()
                     .filter(region -> !registeredNodes.contains(region.getId()))
@@ -171,40 +171,35 @@ public class BattleAnalysisImpl implements BattleAnalysis {
                 .filter(edge -> !edge.getTarget().getOwner().equals(OwnerType.Self))
                 .collect(Collectors.toList());
 
-        moves.addAll(getAttacksToSameSuperRegion(region, notSelfEdges));
-        moves.addAll(getAttacksToOtherSuperRegions(region, notSelfEdges));
-
-        return moves;
-    }
-
-    private List<Move> getAttacksToSameSuperRegion(Region region, List<RegionEdge> notSelfEdges) {
-        List<Move> moves = new ArrayList<>();
-
-        notSelfEdges
+        List<RegionEdge> sameSuperRegionEdges = notSelfEdges
                 .stream()
                 .filter(edge -> edge.getTarget().getSuperRegionId().equals(region.getSuperRegionId()))
-                .forEach(edge -> {
-                    if (canAttackToNeutral(region, edge.getTarget())) {
-                        moves.add(createMove(region, edge));
-                    } else if (canAttackToEnemy(region, edge.getTarget())) {
-                        moves.add(createMove(region, edge));
-                    }
-                });
+                .collect(Collectors.toList());
+
+        List<RegionEdge> differentSuperRegionEdges = notSelfEdges
+                .stream()
+                .filter(edge -> !edge.getTarget().getSuperRegionId().equals(region.getSuperRegionId()))
+                .collect(Collectors.toList());
+
+        moves.addAll(getAttacksTo(sameSuperRegionEdges));
+        moves.addAll(getAttacksTo(differentSuperRegionEdges));
 
         return moves;
     }
 
-    private List<Move> getAttacksToOtherSuperRegions(Region region, List<RegionEdge> notSelfEdges) {
+    private List<Move> getAttacksTo(List<RegionEdge> notSelfEdges) {
         List<Move> moves = new ArrayList<>();
 
         notSelfEdges
                 .stream()
-                .filter(edge -> !edge.getTarget().getSuperRegionId().equals(region.getSuperRegionId()))
                 .forEach(edge -> {
-                    if (canAttackToNeutral(region, edge.getTarget())) {
-                        moves.add(createMove(region, edge));
-                    } else if (canAttackToEnemy(region, edge.getTarget())) {
-                        moves.add(createMove(region, edge));
+                    Region from = edge.getSource();
+                    Region to = edge.getTarget();
+
+                    if (canAttackToNeutral(from, to)) {
+                        moves.add(createMove(from, edge));
+                    } else if (canAttackToEnemy(from, to)) {
+                        moves.add(createMove(from, edge));
                     }
                 });
 

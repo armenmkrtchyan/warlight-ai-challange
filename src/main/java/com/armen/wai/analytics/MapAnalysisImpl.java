@@ -4,16 +4,11 @@ import com.armen.wai.map.Region;
 import com.armen.wai.map.RegionEdge;
 import com.armen.wai.map.WarlightMap;
 import com.armen.wai.util.helper.OwnerType;
-
 import org.jgrapht.alg.interfaces.SpanningTreeAlgorithm;
 import org.jgrapht.alg.spanning.KruskalMinimumSpanningTree;
+import org.jgrapht.alg.util.Pair;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * @author armen.mkrtchyan
@@ -28,19 +23,26 @@ public class MapAnalysisImpl implements MapAnalysis {
 
     public List<Region> suggestRegionOrder(Collection<Region> regions) {
         List<Region> suggestion = new ArrayList<>(regions);
-        TreeMap<Double, List<Region>> treeMap = new TreeMap<>(Comparator.reverseOrder());
+        TreeMap<Pair<Integer, Integer>, List<Region>> treeMap = new TreeMap<>((o1, o2) -> {
+            int compareTo = o1.getFirst().compareTo(o2.getFirst());
+            if (compareTo == 0) {
+                return -1 * o1.getSecond().compareTo(o2.getSecond());
+            } else {
+                return -1 * compareTo;
+            }
+        });
 
         for (Region region : suggestion) {
             KruskalMinimumSpanningTree<Region, RegionEdge> spanningTreeAlgorithm = new KruskalMinimumSpanningTree<>(
                     warlightMap.getSuperRegionGraph(region.getSuperRegionId()));
             SpanningTreeAlgorithm.SpanningTree<RegionEdge> spanningTree = spanningTreeAlgorithm.getSpanningTree();
             int weight = Double.valueOf(spanningTree.getWeight()).intValue();
-            double key = (1.5 * weight) / spanningTree.getEdges().size();
+            Pair<Integer, Integer> key = Pair.of(weight, spanningTree.getEdges().size());
             treeMap.computeIfAbsent(key, aDouble -> new ArrayList<>());
             treeMap.get(key).add(region);
         }
         ArrayList<Region> result = new ArrayList<>();
-        for (Map.Entry<Double, List<Region>> entry : treeMap.entrySet()) {
+        for (Map.Entry<Pair<Integer, Integer>, List<Region>> entry : treeMap.entrySet()) {
             result.addAll(entry.getValue());
         }
         return result;
