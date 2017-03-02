@@ -138,12 +138,14 @@ public class BattleAnalysisImpl implements BattleAnalysis {
 
     public List<Move> suggestMoves() {
         List<Move> moves = new ArrayList<>();
-        Collection<Region> ownRegions = warlightMap.getRegionByOwner(OwnerType.Self);
+        List<Region> ownRegions = new ArrayList<>(warlightMap.getRegionByOwner(OwnerType.Self));
 
+        Collections.sort(ownRegions, (o1, o2) -> -1 * o1.getDeployedArmies().compareTo(o2.getDeployedArmies()));
         ownRegions
                 .stream()
                 .filter(region -> region.getDeployedArmies() > 3)
                 .forEach(region -> moves.addAll(getMovesFrom(region)));
+
         return moves;
     }
 
