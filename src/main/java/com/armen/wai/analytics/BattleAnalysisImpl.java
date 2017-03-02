@@ -157,17 +157,57 @@ public class BattleAnalysisImpl implements BattleAnalysis {
         if (transferRegionId > -1) {
             moves.add(new MoveImpl(region.getId(), transferRegionId, region.getDeployedArmies() - 1));
         } else {
-            regionEdges
-                    .stream()
-                    .filter(edge -> !edge.getTarget().getOwner().equals(OwnerType.Self))
-                    .forEach(edge -> {
-                        if (canAttackToNeutral(region, edge.getTarget())) {
-                            moves.add(createMove(region, edge));
-                        } else if (canAttackToEnemy(region, edge.getTarget())) {
-                            moves.add(createMove(region, edge));
-                        }
-                    });
+            moves.addAll(getAttacks(region, regionEdges));
         }
+
+        return moves;
+    }
+
+    private List<Move> getAttacks(Region region, Set<RegionEdge> regionEdges) {
+        List<Move> moves = new ArrayList<>();
+
+        List<RegionEdge> notSelfEdges = regionEdges
+                .stream()
+                .filter(edge -> !edge.getTarget().getOwner().equals(OwnerType.Self))
+                .collect(Collectors.toList());
+
+        moves.addAll(getAttacksToSameSuperRegion(region, notSelfEdges));
+        moves.addAll(getAttacksToOtherSuperRegions(region, notSelfEdges));
+
+        return moves;
+    }
+
+    private List<Move> getAttacksToSameSuperRegion(Region region, List<RegionEdge> notSelfEdges) {
+        List<Move> moves = new ArrayList<>();
+
+        notSelfEdges
+                .stream()
+                .filter(edge -> edge.getTarget().getSuperRegionId().equals(region.getSuperRegionId()))
+                .forEach(edge -> {
+                    if (canAttackToNeutral(region, edge.getTarget())) {
+                        moves.add(createMove(region, edge));
+                    } else if (canAttackToEnemy(region, edge.getTarget())) {
+                        moves.add(createMove(region, edge));
+                    }
+                });
+
+        return moves;
+    }
+
+    private List<Move> getAttacksToOtherSuperRegions(Region region, List<RegionEdge> notSelfEdges) {
+        List<Move> moves = new ArrayList<>();
+
+        notSelfEdges
+                .stream()
+                .filter(edge -> !edge.getTarget().getSuperRegionId().equals(region.getSuperRegionId()))
+                .forEach(edge -> {
+                    if (canAttackToNeutral(region, edge.getTarget())) {
+                        moves.add(createMove(region, edge));
+                    } else if (canAttackToEnemy(region, edge.getTarget())) {
+                        moves.add(createMove(region, edge));
+                    }
+                });
+
         return moves;
     }
 
@@ -182,7 +222,7 @@ public class BattleAnalysisImpl implements BattleAnalysis {
                 .stream()
                 .filter(regionEdge -> mainGraph.edgesOf(regionEdge.getTarget())
                         .stream()
-                        .anyMatch(edge -> edge.getTarget().getOwner().equals(OwnerType.Enemy)))
+                        .anyMatch(edge -> !edge.getTarget().getOwner().equals(OwnerType.Self)))
                 .map(regionEdge -> enemyNeighbourRegions(regionEdge.getTarget())
                         .stream()
                         .max((o1, o2) -> o1.getDeployedArmies().compareTo(o2.getDeployedArmies()))
@@ -220,10 +260,10 @@ public class BattleAnalysisImpl implements BattleAnalysis {
         Integer armiesCount = Double.valueOf(mainGraph.getEdgeWeight(edge) + 1).intValue();
         Integer remainingArmies = region.getDeployedArmies() - armiesCount;
 
-        if (remainingArmies < 4) {
+        edge.getTarget().setOwner(OwnerType.Self);
+        if (remainingArmies < 4 || areAllEdgesSelf(mainGraph.edgesOf(region))) {
             armiesCount = region.getDeployedArmies() - 1;
         }
-        edge.getTarget().setOwner(OwnerType.Self);
         region.setDeployedArmies(region.getDeployedArmies() - armiesCount);
 
         return new MoveImpl(startRegionId, endRegionId, armiesCount);
