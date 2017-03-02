@@ -88,7 +88,7 @@ public class BattleAnalysisImpl implements BattleAnalysis {
                 .max()
                 .orElse(0);
 
-        Integer armiesForDefence = minArmiesCountForDefence(enemyCount + Math.round(2 * enemyAvailableArmies() / 5));
+        Integer armiesForDefence = minArmiesCountForDefence(enemyCount + (int) Math.round((double) (2 * enemyAvailableArmies()) / 5));
         Integer deployedArmies = region.getDeployedArmies();
 
         return armiesForDefence <= deployedArmies
@@ -96,8 +96,8 @@ public class BattleAnalysisImpl implements BattleAnalysis {
                 : armiesForDefence - deployedArmies;
     }
 
-    private Integer minArmiesCountForDefence(int enemyCount) {
-        return Math.round(6 * enemyCount / 10) + 1;
+    private int minArmiesCountForDefence(Integer enemyCount) {
+        return (int) Math.round((double) (6 * enemyCount) / 10) + 1;
     }
 
     private Integer maxNeededDeploymentForRegion(Region region) {
@@ -241,14 +241,14 @@ public class BattleAnalysisImpl implements BattleAnalysis {
 
     private boolean canAttackToNeutral(Region from, Region to) {
         return to.getOwner().equals(OwnerType.Neutral) &&
-                Math.round(3 * (from.getDeployedArmies() - 1) / 5) >=
+                Math.round((double) (3 * (from.getDeployedArmies() - 1)) / 5) >=
                         to.getDeployedArmies();
     }
 
     private boolean canAttackToEnemy(Region from, Region to) {
         return to.getOwner().equals(OwnerType.Enemy) &&
-                Math.round(3 * (from.getDeployedArmies() - 1) / 5) >=
-                        to.getDeployedArmies() + Math.round(2 * enemyAvailableArmies() / 5);
+                Math.round((double) (3 * (from.getDeployedArmies() - 1)) / 5) >=
+                        to.getDeployedArmies() + Math.round((double) (2 * enemyAvailableArmies()) / 5);
     }
 
     private Move createMove(Region region, RegionEdge edge) {
