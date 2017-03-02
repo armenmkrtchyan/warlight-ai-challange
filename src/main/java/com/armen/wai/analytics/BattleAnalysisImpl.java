@@ -97,7 +97,7 @@ public class BattleAnalysisImpl implements BattleAnalysis {
     }
 
     private Integer minArmiesCountForDefence(int enemyCount) {
-        return 10 * enemyCount / 7;
+        return Math.round(6 * enemyCount / 10) + 1;
     }
 
     private Integer maxNeededDeploymentForRegion(Region region) {
