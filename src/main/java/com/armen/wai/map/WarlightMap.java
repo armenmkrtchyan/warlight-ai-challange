@@ -39,4 +39,6 @@ public interface WarlightMap {
 
     Integer superRegionId(Integer regionId);
 
+    boolean isRegionFromOwnedSuperRegions(Region region);
+
 }

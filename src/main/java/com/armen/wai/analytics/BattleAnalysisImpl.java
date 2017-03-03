@@ -38,34 +38,86 @@ public class BattleAnalysisImpl implements BattleAnalysis {
         final List<Deployment> deployments = new ArrayList<>();
         HashSet<Integer> registeredNodes = new HashSet<>();
         final Integer[] availableArmies = {availableArmies()};
-//        for (Region selfRegion : enemyNeighbourRegions(orderedRegions)) {
-//            if (availableArmies[0] <= 0) {
-//                break;
-//            } else {
-//                Integer needed = minNeededDeploymentForRegionDefence(selfRegion);
-//                if (needed > 0) {
-//                    deployments.add(new DeploymentImpl(selfRegion.getId(),
-//                            Math.min(availableArmies[0], needed)));
-//                    availableArmies[0] -= needed;
-//                    registeredNodes.add(selfRegion.getId());
-//                }
-//            }
-//        }
-        if (availableArmies[0] > 0) {
+        Integer armiesForDefence = getDefenceArmiesCount();
+        final Integer[] armiesForAttack = new Integer[1];
+
+        for (Region selfRegion : enemyNeighbourRegions(orderedRegions)) {
+            if (armiesForDefence <= 0) {
+                break;
+            } else {
+                Integer needed = minNeededDeploymentForRegionDefence(selfRegion);
+                if (needed > 0) {
+                    deployments.add(new DeploymentImpl(selfRegion.getId(),
+                            Math.min(armiesForDefence, needed)));
+                    armiesForDefence -= needed;
+                    registeredNodes.add(selfRegion.getId());
+                }
+            }
+        }
+        armiesForAttack[0] = availableArmies[0] - armiesForDefence;
+        if (armiesForAttack[0] > 0) {
             orderedRegions.stream()
                     .filter(region -> !registeredNodes.contains(region.getId()))
                     .forEachOrdered(region -> {
-                        if (availableArmies[0] > 0) {
+                        if (armiesForAttack[0] > 0) {
                             Integer needed = maxNeededDeploymentForRegion(region);
                             if (needed > 0) {
                                 deployments.add(new DeploymentImpl(region.getId(),
-                                        Math.min(availableArmies[0], needed)));
-                                availableArmies[0] -= needed;
+                                        Math.min(armiesForAttack[0], needed)));
+                                armiesForAttack[0] -= needed;
                             }
                         }
                     });
         }
         return deployments;
+    }
+
+    private Integer getDefenceArmiesCount() {
+        double coefficientForDefence = getCoefficientForDefence();
+
+        return ((int) Math.round(coefficientForDefence * availableArmies()));
+    }
+
+    private double getCoefficientForDefence() {
+        Collection<Region> ownedRegions = warlightMap.getRegionByOwner(OwnerType.Self);
+        Collection<Region> regionsFromOwnedSuperRegions = ownedRegions
+                .stream()
+                .filter(warlightMap::isRegionFromOwnedSuperRegions)
+                .collect(Collectors.toList());
+        Collection<Region> enemyNeighbourRegions = enemyNeighbourRegions(regionsFromOwnedSuperRegions);
+
+        return enemyNeighbourRegions.isEmpty()
+                ? 0
+                : calculateCoefficient(enemyNeighbourRegions);
+    }
+
+    private double calculateCoefficient(Collection<Region> enemyNeighbourRegions) {
+        Double availableArmies = availableArmies().doubleValue();
+        Integer needArmiesToDefence = enemyNeighbourRegions
+                .stream()
+                .mapToInt(region -> {
+                    Region maxOfEnemyNeighbourRegion = mainGraph.edgesOf(region)
+                            .stream()
+                            .filter(edge -> edge.getTarget().getOwner().equals(OwnerType.Enemy))
+                            .map(RegionEdge::getTarget)
+                            .max((o1, o2) -> o1.getDeployedArmies().compareTo(o2.getDeployedArmies()))
+                            .orElse(region);
+                    return needArmiesToDefence(region, maxOfEnemyNeighbourRegion);
+                })
+                .sum();
+
+        return needArmiesToDefence > availableArmies
+                ? 1
+                : needArmiesToDefence / availableArmies;
+    }
+
+    private Integer needArmiesToDefence(Region from, Region to) {
+        Integer armiesCount = from.getDeployedArmies();
+        Integer minArmiesCountForDefence = minArmiesCountForDefence(to.getDeployedArmies());
+
+        return armiesCount > minArmiesCountForDefence
+                ? 0
+                : minArmiesCountForDefence - armiesCount;
     }
 
     private Collection<Region> enemyNeighbourRegions(Collection<Region> selfRegions) {
@@ -121,7 +173,9 @@ public class BattleAnalysisImpl implements BattleAnalysis {
                 neededDeployments.add(Double.valueOf(mainGraph.getEdgeWeight(edge) + 1).intValue());
             }
         }
-        return neededDeployments.size() > 0 ? Collections.min(neededDeployments) : 0;
+        return neededDeployments.isEmpty()
+                ? 0
+                : Collections.min(neededDeployments);
     }
 
     private Integer availableArmies() {
@@ -228,7 +282,7 @@ public class BattleAnalysisImpl implements BattleAnalysis {
                 .map(to -> DijkstraShortestPath.findPathBetween(mainGraph, from, to))
                 .collect(Collectors.toList());
 
-        if (graphPaths.size() > 0) {
+        if (!graphPaths.isEmpty()) {
             minGraphPath = Collections
                     .min(graphPaths, (o1, o2) -> ((Integer) o1.getLength()).compareTo(o2.getLength()));
         }

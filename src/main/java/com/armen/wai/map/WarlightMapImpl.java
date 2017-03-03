@@ -258,4 +258,10 @@ public class WarlightMapImpl implements WarlightMap {
     public DirectedGraph<Region, RegionEdge> getMainGraph() {
         return mainGraph;
     }
+
+    public boolean isRegionFromOwnedSuperRegions(Region region) {
+        return getFullyOwnedSuperRegions()
+                .stream()
+                .anyMatch(superRegion -> superRegion.getId().equals(region.getSuperRegionId()));
+    }
 }
