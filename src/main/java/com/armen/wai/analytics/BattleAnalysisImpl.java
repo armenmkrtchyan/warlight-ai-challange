@@ -11,6 +11,8 @@ import com.armen.wai.move.MoveImpl;
 import com.armen.wai.util.Settings;
 import com.armen.wai.util.helper.OwnerType;
 import org.jgrapht.DirectedGraph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -153,7 +155,7 @@ public class BattleAnalysisImpl implements BattleAnalysis {
         List<Move> moves = new ArrayList<>();
         Set<RegionEdge> regionEdges = mainGraph.edgesOf(region);
         Integer transferRegionId = areAllEdgesSelf(regionEdges)
-                ? getTransferRegionId(regionEdges)
+                ? getTransferRegionId(region)
                 : -1;
 
         if (transferRegionId > -1) {
@@ -214,22 +216,44 @@ public class BattleAnalysisImpl implements BattleAnalysis {
                 .allMatch(regionEdge -> regionEdge.getTarget().getOwner().equals(OwnerType.Self));
     }
 
-    private Integer getTransferRegionId(Set<RegionEdge> regionEdges) {
-        List<Region> transferRegions = regionEdges
+    private Integer getTransferRegionId(Region from) {
+        Collection<Region> ownedRegions = warlightMap.getRegionByOwner(OwnerType.Self);
+        GraphPath<Region, RegionEdge> minGraphPath = null;
+        List<GraphPath<Region, RegionEdge>> graphPaths = ownedRegions
                 .stream()
-                .filter(regionEdge -> mainGraph.edgesOf(regionEdge.getTarget())
+                .filter(region -> !from.getId().equals(region.getId()))
+                .filter(region -> mainGraph.edgesOf(region)
                         .stream()
                         .anyMatch(edge -> !edge.getTarget().getOwner().equals(OwnerType.Self)))
-                .map(regionEdge -> enemyNeighbourRegions(regionEdge.getTarget())
-                        .stream()
-                        .max((o1, o2) -> o1.getDeployedArmies().compareTo(o2.getDeployedArmies()))
-                        .orElse(regionEdge.getTarget()))
+                .map(to -> DijkstraShortestPath.findPathBetween(mainGraph, from, to))
                 .collect(Collectors.toList());
 
-        return transferRegions.size() > 0
-                ? Collections.max(transferRegions, (o1, o2) -> o1.getDeployedArmies().compareTo(o2.getDeployedArmies())).getId()
+        if (graphPaths.size() > 0) {
+            minGraphPath = Collections
+                    .min(graphPaths, (o1, o2) -> ((Integer) o1.getLength()).compareTo(o2.getLength()));
+        }
+
+        return minGraphPath != null
+                ? minGraphPath.getVertexList().get(1).getId()
                 : -1;
     }
+
+//    private Integer getTransferRegionId(Set<RegionEdge> regionEdges) {
+//        List<Region> transferRegions = regionEdges
+//                .stream()
+//                .filter(regionEdge -> mainGraph.edgesOf(regionEdge.getTarget())
+//                        .stream()
+//                        .anyMatch(edge -> !edge.getTarget().getOwner().equals(OwnerType.Self)))
+//                .map(regionEdge -> enemyNeighbourRegions(regionEdge.getTarget())
+//                        .stream()
+//                        .max((o1, o2) -> o1.getDeployedArmies().compareTo(o2.getDeployedArmies()))
+//                        .orElse(regionEdge.getTarget()))
+//                .collect(Collectors.toList());
+//
+//        return transferRegions.size() > 0
+//                ? Collections.max(transferRegions, (o1, o2) -> o1.getDeployedArmies().compareTo(o2.getDeployedArmies())).getId()
+//                : -1;
+//    }
 
     private List<Region> enemyNeighbourRegions(Region region) {
         return mainGraph.edgesOf(region)
