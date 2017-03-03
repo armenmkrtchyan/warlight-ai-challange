@@ -238,31 +238,6 @@ public class BattleAnalysisImpl implements BattleAnalysis {
                 : -1;
     }
 
-//    private Integer getTransferRegionId(Set<RegionEdge> regionEdges) {
-//        List<Region> transferRegions = regionEdges
-//                .stream()
-//                .filter(regionEdge -> mainGraph.edgesOf(regionEdge.getTarget())
-//                        .stream()
-//                        .anyMatch(edge -> !edge.getTarget().getOwner().equals(OwnerType.Self)))
-//                .map(regionEdge -> enemyNeighbourRegions(regionEdge.getTarget())
-//                        .stream()
-//                        .max((o1, o2) -> o1.getDeployedArmies().compareTo(o2.getDeployedArmies()))
-//                        .orElse(regionEdge.getTarget()))
-//                .collect(Collectors.toList());
-//
-//        return transferRegions.size() > 0
-//                ? Collections.max(transferRegions, (o1, o2) -> o1.getDeployedArmies().compareTo(o2.getDeployedArmies())).getId()
-//                : -1;
-//    }
-
-    private List<Region> enemyNeighbourRegions(Region region) {
-        return mainGraph.edgesOf(region)
-                .stream()
-                .filter(regionEdge -> !regionEdge.getTarget().getOwner().equals(OwnerType.Self))
-                .map(RegionEdge::getTarget)
-                .collect(Collectors.toList());
-    }
-
     private boolean canAttackToNeutral(Region from, Region to) {
         return to.getOwner().equals(OwnerType.Neutral) &&
                 Math.round((double) (3 * (from.getDeployedArmies() - 1)) / 5) >=
